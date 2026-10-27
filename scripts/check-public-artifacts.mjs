@@ -12,7 +12,7 @@ for (const name of [".env", ".env.local", ".env.txt"]) {
   try { content = await fs.readFile(path.join(root, name), "utf8"); } catch (error) { if (error.code === "ENOENT") continue; throw error; }
   for (const line of content.split(/\r?\n/)) {
     const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
-    if (!match || !/KEY|TOKEN|SECRET/.test(match[1])) continue;
+    if (!match || !/KEY|TOKEN|SECRET/.test(match[1]) || match[1] === "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY") continue;
     const value = match[2].replace(/^(['"])(.*)\1$/, "$2");
     if (value.length >= 16) secrets.push(value);
   }
@@ -35,7 +35,7 @@ await walk(root);
 await walk(path.join(root, ".next", "static"), true);
 const violations = [];
 function containsCredential(content) {
-  return secrets.some((value) => content.includes(value)) || /\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b/.test(content) || /\bAIza[A-Za-z0-9_-]{35}\b/.test(content);
+  return secrets.some((value) => content.includes(value)) || /\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b/.test(content) || /\bsk_(?:test|live)_[A-Za-z0-9]{20,}\b/.test(content) || /\bAIza[A-Za-z0-9_-]{35}\b/.test(content);
 }
 for (const file of files) {
   const content = await fs.readFile(file, "utf8");

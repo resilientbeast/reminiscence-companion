@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { DEFAULT_POLICY, policySchema } from "../lib/contracts";
 import type { Candidate, Kind, Policy, SessionItem } from "../lib/contracts";
 import type { Anchor, PlanResponse } from "../lib/planner-contracts";
 import { acceptCandidate, needsReview, orderSession } from "../lib/browser-state";
 import { evaluateCandidatePolicy } from "../lib/policy";
+import { savedSnapshotSchema } from "../lib/saved-session-contracts";
+import type { SavedSession } from "../lib/saved-session-contracts";
 
 const categoryName: Record<Kind, string> = { artist: "Music artists", film: "Films", tv: "TV shows" };
 const presets: { name: string; query: string; kind: Kind }[] = [
@@ -18,40 +20,69 @@ const presets: { name: string; query: string; kind: Kind }[] = [
 ];
 const distinct = (ids: string[]) => [...new Set(ids)].slice(0, 100);
 
-async function post<T>(path: string, input: unknown): Promise<T> {
-  const response = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input), signal: AbortSignal.timeout(25_000) });
+async function post<T>(path: string, input: unknown, method = "POST"): Promise<T> {
+  const response = await fetch(path, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(input), signal: AbortSignal.timeout(25_000) });
   const body = await response.json();
   if (!response.ok) throw new Error(typeof body.error === "string" ? body.error : "This request could not be completed.");
   return body as T;
 }
 
-export default function Planner() {
+export default function Planner({ mode = "demo", initialSession, onSaved, onDirtyChange }: { mode?: "demo" | "personal"; initialSession?: SavedSession; onSaved?: (session: SavedSession) => void; onDirtyChange?: (dirty: boolean) => void }) {
+  const initial = initialSession?.snapshot;
+  const endpoint = mode === "demo" ? "/api/demo" : "/api";
   const [query, setQuery] = useState("");
   const [searchKind, setSearchKind] = useState<Kind>("artist");
   const [matches, setMatches] = useState<Anchor[] | null>(null);
-  const [anchors, setAnchors] = useState<Anchor[]>([]);
-  const [kinds, setKinds] = useState<Kind[]>(["artist", "film", "tv"]);
-  const [policy, setPolicy] = useState<Policy>({ ...DEFAULT_POLICY });
-  const [eraFrom, setEraFrom] = useState("");
-  const [eraTo, setEraTo] = useState("");
-  const [positiveIds, setPositive] = useState<string[]>([]);
-  const [rejectedIds, setRejected] = useState<string[]>([]);
+  const [anchors, setAnchors] = useState<Anchor[]>(initial?.anchors ?? []);
+  const [kinds, setKinds] = useState<Kind[]>(initial?.kinds ?? ["artist", "film", "tv"]);
+  const [policy, setPolicy] = useState<Policy>(initial?.policy ?? { ...DEFAULT_POLICY });
+  const [eraFrom, setEraFrom] = useState(initial?.eraFrom ?? "");
+  const [eraTo, setEraTo] = useState(initial?.eraTo ?? "");
+  const [positiveIds, setPositive] = useState<string[]>(initial?.positiveIds ?? []);
+  const [rejectedIds, setRejected] = useState<string[]>(initial?.rejectedIds ?? []);
   const [skippedIds, setSkipped] = useState<string[]>([]);
-  const [accepted, setAccepted] = useState<SessionItem[]>([]);
-  const [feedback, setFeedback] = useState<Record<string, string>>({});
-  const [names, setNames] = useState<Record<string, string>>({});
+  const [accepted, setAccepted] = useState<SessionItem[]>(initial?.accepted ?? []);
+  const [feedback, setFeedback] = useState<Record<string, string>>(initial?.feedback ?? {});
+  const [names, setNames] = useState<Record<string, string>>(initial?.names ?? {});
   const [plan, setPlan] = useState<PlanResponse | null>(null);
   const [previous, setPrevious] = useState<PlanResponse | null>(null);
-  const [busy, setBusy] = useState<"search" | "plan" | null>(null);
+  const [busy, setBusy] = useState<"search" | "plan" | "save" | null>(null);
   const [message, setMessage] = useState("Search a cultural favourite, then confirm the exact match. Please leave out names, health details and care notes.");
-  const [phase, setPhase] = useState<"building" | "active" | "finished">("building");
+  const [phase, setPhase] = useState<"building" | "active" | "finished">(initial?.phase ?? "building");
   const [reviewedAnchors, setReviewedAnchors] = useState<string[]>([]);
   const pending = useRef(false);
+  const [savedRecord, setSavedRecord] = useState(initialSession ? { id: initialSession.id, revision: initialSession.revision } : undefined);
+  const [savedFingerprint, setSavedFingerprint] = useState(initial ? JSON.stringify(initial) : "");
+  const retainedIds = new Set([...positiveIds, ...rejectedIds, ...Object.keys(feedback), ...accepted.map(item => item.candidate.qlooEntityId)]);
+  const snapshot = { version: 1, anchors, kinds, policy, eraFrom, eraTo, positiveIds, rejectedIds, accepted, feedback, names: Object.fromEntries(Object.entries(names).filter(([id]) => retainedIds.has(id))), phase };
+  const fingerprint = JSON.stringify(snapshot);
+  const dirty = mode === "personal" && Boolean(anchors.length || accepted.length || savedRecord) && fingerprint !== savedFingerprint;
+  useEffect(() => { onDirtyChange?.(dirty); }, [dirty, onDirtyChange]);
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+
+  async function save(asNew = false) {
+    if (pending.current || mode !== "personal") return;
+    const parsed = savedSnapshotSchema.safeParse(snapshot);
+    if (!parsed.success) { setMessage("Check your activity choices, categories and era before saving. Only accepted, rating-eligible activities can be saved."); return; }
+    pending.current = true; setBusy("save");
+    try {
+      const current = asNew ? undefined : savedRecord;
+      const data = await post<{ session: SavedSession }>(current ? `/api/sessions/${current.id}` : "/api/sessions", { snapshot: parsed.data, ...(current ? { revision: current.revision } : {}) }, current ? "PUT" : "POST");
+      setSavedRecord({ id: data.session.id, revision: data.session.revision }); setSavedFingerprint(JSON.stringify(data.session.snapshot)); onSaved?.(data.session);
+      setMessage("Session saved privately to your account. You can reopen it from My saved sessions on another device.");
+    } catch (error) { setMessage((error instanceof Error ? error.message : "Saving is unavailable.") + " Your open session is still here."); }
+    finally { pending.current = false; setBusy(null); }
+  }
 
   async function search(event: FormEvent) {
     event.preventDefault(); if (pending.current) return;
     pending.current = true; setBusy("search"); setMatches(null); setMessage("Searching Qloo for the exact match…");
-    try { const data = await post<{ results: Anchor[] }>("/api/search", { query, kind: searchKind }); setMatches(data.results); setMessage(data.results.length ? "Confirm the exact favourite below. Search results are not automatically added." : "No match in this category. Try another spelling, a native-language name, or a different favourite."); }
+    try { const data = await post<{ results: Anchor[] }>(`${endpoint}/search`, { query, kind: searchKind }); setMatches(data.results); setMessage(data.results.length ? "Confirm the exact favourite below. Search results are not automatically added." : "No match in this category. Try another spelling, a native-language name, or a different favourite."); }
     catch (error) { setMessage(error instanceof Error ? error.message : "Search is unavailable. Try again."); }
     finally { pending.current = false; setBusy(null); }
   }
@@ -69,7 +100,7 @@ export default function Planner() {
     pending.current = true; setBusy("plan"); setMessage("Finding Qloo possibilities, selecting a small set, and checking returned content notes…");
     const boundPolicy = { ...policy, ...(eraFrom || eraTo ? { screenEra: { ...(eraFrom ? { from: +eraFrom } : {}), ...(eraTo ? { to: +eraTo } : {}) } } : {}) };
     try {
-      const data = await post<PlanResponse>("/api/plan", { kinds, state: { anchorIds: anchors.map((a) => a.id), positiveIds, rejectedIds, skippedIds, acceptedIds: accepted.map((item) => item.candidate.qlooEntityId), seenIds: plan?.candidates.map((c) => c.qlooEntityId) ?? [], policy: boundPolicy } });
+      const data = await post<PlanResponse>(`${endpoint}/plan`, { kinds, state: { anchorIds: anchors.map((a) => a.id), positiveIds, rejectedIds, skippedIds, acceptedIds: accepted.map((item) => item.candidate.qlooEntityId), seenIds: plan?.candidates.map((c) => c.qlooEntityId) ?? [], policy: boundPolicy } });
       setPrevious(plan); setPlan(data); setSkipped([]);
       setNames((current) => ({ ...current, ...Object.fromEntries(data.candidates.map((candidate) => [candidate.qlooEntityId, candidate.name])) }));
       setMessage(data.candidates.length ? `${data.candidates.length} possibilities ready for your review. Your ${accepted.length} accepted activities remain in place.` : "No usable matches this time. Your accepted activities remain in place. Try a different favourite or category.");
@@ -112,7 +143,8 @@ export default function Planner() {
   }
 
   return <div className="planner" id="planner">
-    <div className="planner-intro"><p className="eyebrow">A few familiar starting points</p><h2>Make a little time together.</h2><p>Choose favourites, review possibilities, and keep two or three activities. Everything stays in this browser tab; refreshing the page clears it.</p></div>
+    <div className="planner-intro"><p className="eyebrow">A few familiar starting points</p><h2>{initialSession ? "Return to your time together." : "Prepare a short activity session."}</h2><p>Choose favourites, review possibilities, and keep two or three activities. {mode === "demo" ? "This temporary demo stays in this browser tab; refreshing the page clears it." : "Use Save session to keep your choices in your private account. Unsaved changes clear when you leave or refresh."}</p></div>
+    {mode === "personal" && <div className="saved-toolbar no-print"><button className="primary-button" disabled={!!busy || (!anchors.length && !accepted.length) || (!!savedRecord && !dirty)} onClick={() => void save()}>{busy === "save" ? "Saving…" : savedRecord ? "Save changes" : "Save session"}</button>{savedRecord && <button disabled={!!busy} onClick={() => void save(true)}>Save as new session</button>}<span className="save-status" role="status">{dirty ? "Unsaved changes" : savedRecord ? "Saved to your account" : "Not saved yet"}</span></div>}
     <p role="status" aria-live="polite" className="status-message">{message}</p>
     <div className="planner-layout">
       <div className="workspace">
@@ -150,7 +182,7 @@ export default function Planner() {
           {phase === "building" ? <><div className="preference-grid"><label>Activity<select value={item.activity} onChange={(e) => setAccepted(accepted.map((row, i) => i === index ? { ...row, activity: e.target.value as SessionItem["activity"] } : row))}><option value="listen">Listen</option><option value="view">View</option><option value="talk">Talk</option></select></label><label>Minutes<input type="number" min={1} max={20} value={item.suggestedMinutes} onChange={(e) => { const minutes = +e.target.value; if (Number.isInteger(minutes) && minutes >= 1 && minutes <= 20) setAccepted(accepted.map((row, i) => i === index ? { ...row, suggestedMinutes: minutes } : row)); }} /></label></div><div className="button-row"><button disabled={!!busy || index === 0} aria-label={`Move ${item.candidate.name} earlier`} onClick={() => setAccepted(orderSession(accepted, index, -1))}>↑</button><button disabled={!!busy || index === accepted.length - 1} aria-label={`Move ${item.candidate.name} later`} onClick={() => setAccepted(orderSession(accepted, index, 1))}>↓</button><button disabled={!!busy} onClick={() => setAccepted(accepted.filter((_, i) => i !== index))}>Remove</button></div></> : <><p><strong>{item.activity} · {item.suggestedMinutes} minutes</strong></p><p className="conversation-prompt">{item.prompt}</p><MediaLink candidate={item.candidate} /><div className="button-row no-print"><button disabled={!!busy} onClick={() => { workedWell(item.candidate); }}>Worked well</button><button onClick={() => reject(item.candidate)}>Not for them</button></div><p className="small-note">{feedback[item.candidate.qlooEntityId]}</p></>}
         </li>)}</ol>
         {phase === "building" && <button className="primary-button" disabled={accepted.length < 2 || !!busy} onClick={() => { setPhase("active"); setMessage("Your session is ready. Take it at the person’s pace; passing or stopping is always fine."); }}>Start this session</button>}
-        {phase === "active" && <button className="primary-button no-print" onClick={() => { setPhase("finished"); setMessage("Session finished. Your activities and observations remain here until you refresh the page."); }}>Finish session</button>}
+        {phase === "active" && <button className="primary-button no-print" onClick={() => { setPhase("finished"); setMessage(mode === "personal" ? "Session finished. Save changes to keep your activities and observations for another day." : "Session finished. Your activities and observations remain here until you refresh the page."); }}>Finish session</button>}
         {phase === "finished" && <p className="notice">Session finished. Keep what worked, and follow their lead next time.</p>}
         {phase !== "building" && <div className="button-row no-print"><button onClick={() => setPhase("building")}>Back to planning</button><button onClick={() => window.print()}>Print session</button></div>}
         <p className="small-note">An activity aid, not therapy. A content check can miss things; you have the final say. Stop or switch whenever the person wishes.</p>

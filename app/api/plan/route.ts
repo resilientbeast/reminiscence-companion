@@ -1,16 +1,9 @@
-import { planSession } from "../../../lib/planner";
-import { errorResponse, jsonHeaders, readRequest } from "../../../lib/http";
-import { planInputSchema } from "../../../lib/planner-contracts";
-import { acquireAdmission } from "../../../lib/admission";
+import { errorResponse } from "../../../lib/http";
+import { runPlan } from "../../../lib/planning-handlers";
+import { requireUser } from "../../../lib/auth";
 
 export const runtime = "nodejs";
 export async function POST(request: Request) {
-  let release: (() => void) | undefined;
-  try {
-    const input = planInputSchema.parse(await readRequest(request));
-    release = acquireAdmission("plan");
-    return Response.json(await planSession(input, { signal: request.signal }), { headers: jsonHeaders });
-  }
-  catch (error) { return errorResponse(error); }
-  finally { release?.(); }
+  try { await requireUser(); } catch (error) { return errorResponse(error); }
+  return runPlan(request);
 }

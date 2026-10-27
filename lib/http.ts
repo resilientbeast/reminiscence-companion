@@ -2,7 +2,7 @@ import "server-only";
 import { ServiceError } from "./qloo.ts";
 
 export const jsonHeaders = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
-export async function readRequest(request: Request) {
+export async function readRequest(request: Request, maxBytes = 20_000) {
   const origin = request.headers.get("origin");
   if (origin) {
     let source: URL;
@@ -18,7 +18,7 @@ export async function readRequest(request: Request) {
   for (;;) {
     const next = await reader.read(); if (next.done) break;
     length += next.value.length;
-    if (length > 20_000) { await reader.cancel(); throw new ServiceError("input", "This request is too large.", 413); }
+    if (length > maxBytes) { await reader.cancel(); throw new ServiceError("input", "This request is too large.", 413); }
     chunks.push(next.value);
   }
   try { return JSON.parse(Buffer.concat(chunks).toString("utf8")) as unknown; } catch { throw new ServiceError("input", "The request could not be read.", 400); }

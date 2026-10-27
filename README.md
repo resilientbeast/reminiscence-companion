@@ -1,8 +1,10 @@
 # Reminiscence Companion
 
-A caregiver-guided activity planner built around confirmed favourites and optional related cultural discoveries. An activity aid for caregivers. Not medical advice or therapy. Follow the person's lead.
+A practical activity planner for family caregivers supporting someone living with dementia. Begin with familiar music, films or TV, review related possibilities, and build a short session to share. An activity aid, not medical advice or therapy. Follow the person's lead.
 
 ## Current status
+
+The account-stage build adds a landing page explaining the dementia-caregiver audience and workflow, Clerk signup/login, and private Firestore saved sessions. `/workspace` is authenticated; `/demo` retains the complete temporary planning flow without signup. Saving is explicit, each account can hold 20 sessions, and revision checks prevent silent overwrites from an older tab. See [account setup and verification](docs/hackathon-build/accounts.md). The deployment record distinguishes the released artifact from work in progress.
 
 The [public app](https://reminiscence-companion-712638577178.us-central1.run.app/) supports live Qloo search and exact-match confirmation, bounded Gemini tool use, grounded advisory content checks, explicit acceptance, favourite/rejection feedback, before/after ranking evidence, and an ordered two- or three-activity session with start/finish and print controls. Rating-held results cannot enter a session. Missing/failed screening stays visible for caregiver review.
 
@@ -18,7 +20,7 @@ npm run check
 npm run dev
 ```
 
-Open `http://127.0.0.1:3000`. The health route is `/api/health`.
+Open `http://127.0.0.1:3000` for development. For the standalone server, bind `HOSTNAME=localhost`, `PORT=3000` and open `http://localhost:3000`. The health route is `/api/health`.
 
 For local source protection, run `npm run hooks:install` once per checkout and `npm run test:guard` to test it. The hook scans staged blobs as well as working assets, rejects private/config paths and known/key-pattern credentials, and never prints credential values. Installation preserves any different existing hook configuration. This does not replace a release secret review.
 
@@ -31,7 +33,7 @@ npm run start
 
 With the production server running, `npm run smoke` checks the page, health response, stylesheet and private-path isolation. It is an HTTP check; visual and interaction verification are separate.
 
-Copy `.env.example` to `.env.local` and fill server-only values locally. Obtain a personal Qloo key through the [official developer guide](https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide). Hackathon keys use the hackathon endpoint. Never place a key in a `NEXT_PUBLIC_` variable, browser bundle, public repository or recording. Existing private `.env.txt` research credentials are not automatically loaded by this scaffold.
+Copy `.env.example` to `.env.local` and fill values locally. Obtain a personal Qloo key through the [official developer guide](https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide). Hackathon keys use the hackathon endpoint. Provider keys and `CLERK_SECRET_KEY` belong only on the server. Clerk's `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is intentionally public; it does not grant backend access. Existing private `.env.txt` research credentials are not automatically loaded by this scaffold.
 
 ## Gemini setup and integration spike
 
@@ -74,7 +76,7 @@ With the production server running, `npm run smoke:live` spends provider quota o
 - The model-facing recommendation input accepts only category and bounded pool size. Signals, exclusions and caregiver constraints are bound by code.
 - Film ratings default to G/PG; TV uses TV-G/TV-PG. Unknown/legacy ratings remain held. Music has no verified rating or era assurance.
 - Review, screening status, familiarity and observed feedback have different meanings. Only explicitly accepted, rating-eligible cards enter a session.
-- Accepted cards and before/after orders stay in browser memory and clear on page refresh. The server caches only bounded public cultural metadata; it does not retain session records or log request bodies. Leave recipient names, health details and care notes out of search.
+- The guest demo stays in browser memory. Logged-in caregivers can explicitly save favourites, accepted activities, preferences and feedback in their private Firestore workspace and reopen/update/delete them across devices. Unsaved changes and discovery traces clear on page refresh. Request bodies are not logged. Leave recipient names, health details and care notes out of the app.
 - Qloo input influence is not a probability of enjoyment or evidence of a personal memory. A plain LLM was competitive in exploratory research; no superiority claim is made.
 
 ## Container

@@ -1,12 +1,20 @@
 import assert from "node:assert/strict";
 
-const base = process.env.SMOKE_BASE_URL || "http://127.0.0.1:3000";
+const base = process.env.SMOKE_BASE_URL || "http://localhost:3000";
 const page = await fetch(new URL("/", base));
 assert.equal(page.status, 200);
 const html = await page.text();
-assert.ok(html.includes("Caregiver-guided activities") && html.includes("Confirm a favourite"));
+assert.ok(html.includes("caregivers of people living with dementia") && html.includes("Create your account"));
 assert.ok(html.includes('id="main"') && html.includes('href="#main"'), "Keyboard skip target must exist.");
 assert.ok(html.includes("Not medical advice or therapy"));
+const demo = await fetch(new URL("/demo", base));
+assert.equal(demo.status, 200);
+assert.ok((await demo.text()).includes("Confirm a favourite"));
+for (const pathname of ["/api/sessions", "/api/sessions/11111111-1111-4111-8111-111111111111"]) {
+  const response = await fetch(new URL(pathname, base));
+  assert.equal(response.status, 401, "Private session data must require login.");
+  assert.equal((await response.json()).code, "sign_in_required");
+}
 
 const health = await fetch(new URL("/api/health", base));
 assert.equal(health.status, 200);
