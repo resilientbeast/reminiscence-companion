@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { DEFAULT_POLICY } from "../lib/contracts.ts";
-import { savedSnapshotSchema, saveSessionSchema, updateSessionSchema } from "../lib/saved-session-contracts.ts";
+import { savedSnapshotSchema, saveSessionSchema, updateSessionSchema, toSavedAnchor } from "../lib/saved-session-contracts.ts";
 import { ownerDocumentId } from "../lib/session-store.ts";
 
 const id = "11111111-1111-4111-8111-111111111111";
@@ -12,6 +12,14 @@ test("saved sessions accept a bounded reviewed activity but reject held, unaccep
   assert.equal(savedSnapshotSchema.safeParse(snapshot).success, true);
   for (const override of [{ review: "pending" }, { ratingGate: "held" }]) assert.equal(savedSnapshotSchema.safeParse({ ...snapshot, accepted: [{ ...snapshot.accepted[0], candidate: { ...candidate, ...override } }] }).success, false);
   assert.equal(savedSnapshotSchema.safeParse({ ...snapshot, accepted: [...snapshot.accepted, ...snapshot.accepted] }).success, false);
+});
+test("real-shaped search anchors discard extra provider metadata before the strict save boundary", () => {
+  const anchor = { id, name: "Synthetic favourite", kind: "artist" as const, blurb: "Synthetic source", metadata: { tags: ["synthetic"] }, contentRating: "unverified", spotifyArtistId: "x".repeat(22) };
+  assert.equal(savedSnapshotSchema.safeParse({ ...snapshot, anchors: [anchor] }).success, false);
+  const saved = toSavedAnchor(anchor);
+  assert.equal(savedSnapshotSchema.safeParse({ ...snapshot, anchors: [saved] }).success, true);
+  assert.equal("metadata" in saved, false);
+  assert.equal("spotifyArtistId" in saved, false);
 });
 test("saving cannot smuggle ownership, personal notes, discovery pools or traces", () => {
   for (const extra of [{ ownerId: "someone-else" }, { patientName: "Synthetic" }, { notes: "not supported" }, { plan: {} }, { trace: {} }]) assert.equal(saveSessionSchema.safeParse({ snapshot, ...extra }).success, false);

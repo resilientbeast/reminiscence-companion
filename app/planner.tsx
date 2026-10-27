@@ -7,7 +7,7 @@ import type { Candidate, Kind, Policy, SessionItem } from "../lib/contracts";
 import type { Anchor, PlanResponse } from "../lib/planner-contracts";
 import { acceptCandidate, needsReview, orderSession } from "../lib/browser-state";
 import { evaluateCandidatePolicy } from "../lib/policy";
-import { savedSnapshotSchema } from "../lib/saved-session-contracts";
+import { savedSnapshotSchema, toSavedAnchor } from "../lib/saved-session-contracts";
 import type { SavedSession } from "../lib/saved-session-contracts";
 
 const categoryName: Record<Kind, string> = { artist: "Music artists", film: "Films", tv: "TV shows" };
@@ -54,7 +54,7 @@ export default function Planner({ mode = "demo", initialSession, onSaved, onDirt
   const [savedRecord, setSavedRecord] = useState(initialSession ? { id: initialSession.id, revision: initialSession.revision } : undefined);
   const [savedFingerprint, setSavedFingerprint] = useState(initial ? JSON.stringify(initial) : "");
   const retainedIds = new Set([...positiveIds, ...rejectedIds, ...Object.keys(feedback), ...accepted.map(item => item.candidate.qlooEntityId)]);
-  const snapshot = { version: 1, anchors, kinds, policy, eraFrom, eraTo, positiveIds, rejectedIds, accepted, feedback, names: Object.fromEntries(Object.entries(names).filter(([id]) => retainedIds.has(id))), phase };
+  const snapshot = { version: 1, anchors: anchors.map(toSavedAnchor), kinds, policy, eraFrom, eraTo, positiveIds, rejectedIds, accepted, feedback, names: Object.fromEntries(Object.entries(names).filter(([id]) => retainedIds.has(id))), phase };
   const fingerprint = JSON.stringify(snapshot);
   const dirty = mode === "personal" && Boolean(anchors.length || accepted.length || savedRecord) && fingerprint !== savedFingerprint;
   useEffect(() => { onDirtyChange?.(dirty); }, [dirty, onDirtyChange]);

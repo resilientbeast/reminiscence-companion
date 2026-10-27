@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { candidateSchema, kindSchema, policySchema, sessionItemSchema } from "./contracts.ts";
+import type { Anchor } from "./planner-contracts.ts";
 
 const entityId = z.uuid().transform(id => id.toUpperCase());
 const idList = (limit: number) => z.array(entityId).max(limit).refine(ids => new Set(ids).size === ids.length);
@@ -7,6 +8,10 @@ export const savedAnchorSchema = z.object({
   id: entityId, name: z.string().min(1).max(300), kind: kindSchema,
   year: z.number().int().optional(), blurb: z.string().max(1600), startingCandidate: candidateSchema.optional(),
 }).strict();
+export function toSavedAnchor(anchor: Anchor) {
+  const { id, name, kind, year, blurb, startingCandidate } = anchor;
+  return { id, name, kind, year, blurb, startingCandidate };
+}
 // Only the explicitly saved working session is retained, not discovery pools or request traces.
 export const savedSnapshotSchema = z.object({
   version: z.literal(1), anchors: z.array(savedAnchorSchema).max(6),
