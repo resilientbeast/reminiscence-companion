@@ -12,6 +12,10 @@ Gemini uses the direct Google provider with `gemini-3.8-flash`. Linux-container 
 
 ## Local setup
 
+New sessions reuse favourites, explicit positive/negative feedback and discovery preferences from this account's saved sessions. The latest saved decision wins for conflicting feedback; new activity lists start empty. Use **Start without saved preferences** for a fresh session. Saving remains explicit, and deleting a saved session removes it from the history used for future sessions. One caregiver workspace currently represents one person.
+
+Search resolves matches after a 500 ms pause in typing, cancels superseded requests, and caches a small number of recent lookups in the open page. Exact-match confirmation is still required. Result and discovery images come only from Qloo-returned HTTPS image URLs, with a placeholder when missing or unavailable. Clerk development mode is the chosen hackathon configuration; migration to production is outside this demo's scope.
+
 Use Node.js 24.21.0 and npm. From a clean checkout:
 
 ```sh

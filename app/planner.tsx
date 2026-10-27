@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
 import { DEFAULT_POLICY, policySchema } from "../lib/contracts";
 import type { Candidate, Kind, Policy, SessionItem } from "../lib/contracts";
 import type { Anchor, PlanResponse } from "../lib/planner-contracts";
@@ -9,15 +8,11 @@ import { acceptCandidate, needsReview, orderSession } from "../lib/browser-state
 import { evaluateCandidatePolicy } from "../lib/policy";
 import { savedSnapshotSchema, toSavedAnchor } from "../lib/saved-session-contracts";
 import type { SavedSession } from "../lib/saved-session-contracts";
+import type { SessionMemory } from "../lib/session-memory";
+import { FavouriteSearch } from "./components/favourite-search";
+import { EntityImage } from "./components/entity-image";
 
 const categoryName: Record<Kind, string> = { artist: "Music artists", film: "Films", tv: "TV shows" };
-const presets: { name: string; query: string; kind: Kind }[] = [
-  { name: "Frank Sinatra", query: "Frank Sinatra", kind: "artist" },
-  { name: "The Sound of Music", query: "The Sound of Music", kind: "film" },
-  { name: "I Love Lucy", query: "I Love Lucy", kind: "tv" },
-  { name: "Lata Mangeshkar", query: "Lata Mangeshkar", kind: "artist" },
-  { name: "Teresa Teng · 鄧麗君", query: "鄧麗君", kind: "artist" },
-];
 const distinct = (ids: string[]) => [...new Set(ids)].slice(0, 100);
 
 async function post<T>(path: string, input: unknown, method = "POST"): Promise<T> {
@@ -27,12 +22,9 @@ async function post<T>(path: string, input: unknown, method = "POST"): Promise<T
   return body as T;
 }
 
-export default function Planner({ mode = "demo", initialSession, onSaved, onDirtyChange }: { mode?: "demo" | "personal"; initialSession?: SavedSession; onSaved?: (session: SavedSession) => void; onDirtyChange?: (dirty: boolean) => void }) {
-  const initial = initialSession?.snapshot;
+export default function Planner({ mode = "demo", initialSession, remembered, onSaved, onDirtyChange }: { mode?: "demo" | "personal"; initialSession?: SavedSession; remembered?: SessionMemory; onSaved?: (session: SavedSession) => void | Promise<void>; onDirtyChange?: (dirty: boolean) => void }) {
+  const initial = initialSession?.snapshot ?? remembered?.snapshot;
   const endpoint = mode === "demo" ? "/api/demo" : "/api";
-  const [query, setQuery] = useState("");
-  const [searchKind, setSearchKind] = useState<Kind>("artist");
-  const [matches, setMatches] = useState<Anchor[] | null>(null);
   const [anchors, setAnchors] = useState<Anchor[]>(initial?.anchors ?? []);
   const [kinds, setKinds] = useState<Kind[]>(initial?.kinds ?? ["artist", "film", "tv"]);
   const [policy, setPolicy] = useState<Policy>(initial?.policy ?? { ...DEFAULT_POLICY });
@@ -46,7 +38,7 @@ export default function Planner({ mode = "demo", initialSession, onSaved, onDirt
   const [names, setNames] = useState<Record<string, string>>(initial?.names ?? {});
   const [plan, setPlan] = useState<PlanResponse | null>(null);
   const [previous, setPrevious] = useState<PlanResponse | null>(null);
-  const [busy, setBusy] = useState<"search" | "plan" | "save" | null>(null);
+  const [busy, setBusy] = useState<"plan" | "save" | null>(null);
   const [message, setMessage] = useState("Search a cultural favourite, then confirm the exact match. Please leave out names, health details and care notes.");
   const [phase, setPhase] = useState<"building" | "active" | "finished">(initial?.phase ?? "building");
   const [reviewedAnchors, setReviewedAnchors] = useState<string[]>([]);
@@ -73,24 +65,17 @@ export default function Planner({ mode = "demo", initialSession, onSaved, onDirt
     try {
       const current = asNew ? undefined : savedRecord;
       const data = await post<{ session: SavedSession }>(current ? `/api/sessions/${current.id}` : "/api/sessions", { snapshot: parsed.data, ...(current ? { revision: current.revision } : {}) }, current ? "PUT" : "POST");
-      setSavedRecord({ id: data.session.id, revision: data.session.revision }); setSavedFingerprint(JSON.stringify(data.session.snapshot)); onSaved?.(data.session);
+      setSavedRecord({ id: data.session.id, revision: data.session.revision }); setSavedFingerprint(JSON.stringify(data.session.snapshot)); await onSaved?.(data.session);
       setMessage("Session saved privately to your account. You can reopen it from My saved sessions on another device.");
     } catch (error) { setMessage((error instanceof Error ? error.message : "Saving is unavailable.") + " Your open session is still here."); }
-    finally { pending.current = false; setBusy(null); }
-  }
-
-  async function search(event: FormEvent) {
-    event.preventDefault(); if (pending.current) return;
-    pending.current = true; setBusy("search"); setMatches(null); setMessage("Searching Qloo for the exact match…");
-    try { const data = await post<{ results: Anchor[] }>(`${endpoint}/search`, { query, kind: searchKind }); setMatches(data.results); setMessage(data.results.length ? "Confirm the exact favourite below. Search results are not automatically added." : "No match in this category. Try another spelling, a native-language name, or a different favourite."); }
-    catch (error) { setMessage(error instanceof Error ? error.message : "Search is unavailable. Try again."); }
     finally { pending.current = false; setBusy(null); }
   }
 
   function confirm(anchor: Anchor) {
     if (pending.current || phase !== "building" || anchors.length >= 6 || anchors.some((item) => item.id === anchor.id)) return;
     const confirmed = { ...anchor, ...(anchor.startingCandidate ? { startingCandidate: { ...anchor.startingCandidate, familiarity: "confirmed_favourite" as const } } : {}) };
-    setAnchors([...anchors, confirmed]); setRejected(rejectedIds.filter((id) => id !== anchor.id)); setMatches(null); setQuery("");
+    setAnchors([...anchors, confirmed]); setRejected(rejectedIds.filter((id) => id !== anchor.id));
+    setNames(current => ({ ...current, [anchor.id]: anchor.name }));
     setMessage(`${anchor.name} is a confirmed favourite. Add another or explore possibilities.`);
   }
 
@@ -139,24 +124,20 @@ export default function Planner({ mode = "demo", initialSession, onSaved, onDirt
   const review = available.filter(needsReview);
 
   function card(candidate: Candidate) {
-    return <Discovery key={`${candidate.provenance.runId}:${candidate.qlooEntityId}`} candidate={candidate} busy={!!busy || phase !== "building"} full={accepted.length >= 3} feedback={feedback[candidate.qlooEntityId]} previous={previous?.candidates.find((c) => c.qlooEntityId === candidate.qlooEntityId)} previousQlooRank={previous?.trace.sourceRanks[candidate.qlooEntityId]} onAccept={() => add(candidate)} onKnown={() => known(candidate)} onReject={() => reject(candidate)} onSkip={() => { setSkipped(distinct([...skippedIds, candidate.qlooEntityId])); setMessage(`${candidate.name} skipped for the next refresh only.`); }} />;
+    const displayed = { ...candidate, provenance: { ...candidate.provenance, attribution: candidate.provenance.attribution.map(attribution => ({ ...attribution, signalName: attribution.signalName === "Supplied taste signal" ? anchors.find(anchor => anchor.id === attribution.signalEntityId)?.name || names[attribution.signalEntityId] || attribution.signalName : attribution.signalName })) } };
+    return <Discovery key={`${candidate.provenance.runId}:${candidate.qlooEntityId}`} candidate={displayed} busy={!!busy || phase !== "building"} full={accepted.length >= 3} feedback={feedback[candidate.qlooEntityId]} previous={previous?.candidates.find((c) => c.qlooEntityId === candidate.qlooEntityId)} previousQlooRank={previous?.trace.sourceRanks[candidate.qlooEntityId]} onAccept={() => add(candidate)} onKnown={() => known(candidate)} onReject={() => reject(candidate)} onSkip={() => { setSkipped(distinct([...skippedIds, candidate.qlooEntityId])); setMessage(`${candidate.name} skipped for the next refresh only.`); }} />;
   }
 
   return <div className="planner" id="planner">
     <div className="planner-intro"><p className="eyebrow">A few familiar starting points</p><h2>{initialSession ? "Return to your time together." : "Prepare a short activity session."}</h2><p>Choose favourites, review possibilities, and keep two or three activities. {mode === "demo" ? "This temporary demo stays in this browser tab; refreshing the page clears it." : "Use Save session to keep your choices in your private account. Unsaved changes clear when you leave or refresh."}</p></div>
+    {!initialSession && remembered && remembered.sourceSessions > 0 && <p className="notice">Starting with preferences from {remembered.sourceSessions} saved {remembered.sourceSessions === 1 ? "session" : "sessions"}: {anchors.length} familiar starting points, {positiveIds.length} additional taste signals and {rejectedIds.length} exclusions. Your activity list starts empty. Review every choice for today.</p>}
     {mode === "personal" && <div className="saved-toolbar no-print"><button className="primary-button" disabled={!!busy || (!anchors.length && !accepted.length) || (!!savedRecord && !dirty)} onClick={() => void save()}>{busy === "save" ? "Saving…" : savedRecord ? "Save changes" : "Save session"}</button>{savedRecord && <button disabled={!!busy} onClick={() => void save(true)}>Save as new session</button>}<span className="save-status" role="status">{dirty ? "Unsaved changes" : savedRecord ? "Saved to your account" : "Not saved yet"}</span></div>}
     <p role="status" aria-live="polite" className="status-message">{message}</p>
     <div className="planner-layout">
       <div className="workspace">
         <section className="panel setup-panel" aria-labelledby="favourites-title">
           <p className="eyebrow">01 · Begin with what they enjoy</p><h3 id="favourites-title">Confirm a favourite</h3>
-          <form onSubmit={search} className="search-form">
-            <label>Category<select value={searchKind} disabled={!!busy || phase !== "building"} onChange={(event) => { setSearchKind(event.target.value as Kind); setMatches(null); }}>{Object.entries(categoryName).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-            <label className="search-input">Artist, film or show<input value={query} onChange={(event) => { setQuery(event.target.value); setMatches(null); }} minLength={2} maxLength={100} placeholder="For example, Frank Sinatra" disabled={!!busy || phase !== "building"} required /></label>
-            <button className="primary-button" type="submit" disabled={!!busy || phase !== "building" || anchors.length >= 6}>{busy === "search" ? "Searching…" : "Find match"}</button>
-          </form>
-          <div className="presets"><span>Try a starting point:</span>{presets.map((preset) => <button type="button" key={preset.query} disabled={!!busy || phase !== "building"} onClick={() => { setQuery(preset.query); setSearchKind(preset.kind); setMatches(null); }}>{preset.name}</button>)}</div>
-          {matches && matches.length > 0 && <ul className="search-results">{matches.map((match) => <li key={match.id}><div><strong>{match.name}</strong><small>{categoryName[match.kind]}{match.year ? ` · ${match.year}` : ""}</small><p>{match.blurb.slice(0, 200)}</p></div><button type="button" disabled={anchors.length >= 6 || anchors.some((a) => a.id === match.id)} onClick={() => confirm(match)}>{anchors.some((a) => a.id === match.id) ? "Confirmed" : "Confirm favourite"}</button></li>)}</ul>}
+          <FavouriteSearch endpoint={endpoint} disabled={!!busy || phase !== "building"} anchors={anchors} onConfirm={confirm} />
           <div className="anchors" aria-label="Confirmed favourites">{anchors.map((anchor) => <span key={anchor.id} className="anchor-chip">{anchor.name}<button type="button" aria-label={`Remove favourite ${anchor.name}`} disabled={!!busy || phase !== "building"} onClick={() => setAnchors(anchors.filter((item) => item.id !== anchor.id))}>×</button></span>)}</div>
           {anchors.filter((anchor) => anchor.startingCandidate && !accepted.some((item) => item.candidate.qlooEntityId === anchor.id)).map((anchor) => <details className="favourite-start" key={anchor.id}><summary>Start with {anchor.name}</summary><p className="small-note">Your confirmed favourite, from Qloo search. This has no recommendation ranking or automated content screen. Film/TV rating and era preferences still apply.</p><p className="small-note">{anchor.blurb || "No description returned."}</p><label className="review-confirmation"><input type="checkbox" checked={reviewedAnchors.includes(anchor.id)} disabled={!!busy || phase !== "building"} onChange={(e) => setReviewedAnchors(e.target.checked ? [...reviewedAnchors, anchor.id] : reviewedAnchors.filter((id) => id !== anchor.id))} />I have reviewed this favourite and want to include it.</label><button type="button" disabled={!!busy || phase !== "building" || accepted.length >= 3 || !reviewedAnchors.includes(anchor.id)} onClick={() => add(anchor.startingCandidate!)}>Accept favourite activity</button></details>)}
           <details className="preferences"><summary>Discovery preferences</summary><fieldset disabled={!!busy || phase !== "building"}><legend>Explore related</legend><div className="check-row">{(Object.keys(categoryName) as Kind[]).map((kind) => <label key={kind}><input type="checkbox" checked={kinds.includes(kind)} onChange={(event) => setKinds(event.target.checked ? [...kinds, kind] : kinds.filter((k) => k !== kind))} />{categoryName[kind]}</label>)}</div><div className="preference-grid"><label>Film ratings<select value={policy.movieRatings} onChange={(e) => setPolicy({ ...policy, movieRatings: e.target.value as Policy["movieRatings"] })}><option value="G_PG">G and PG</option><option value="G">G only</option></select></label><label>TV ratings<select value={policy.tvRatings} onChange={(e) => setPolicy({ ...policy, tvRatings: e.target.value as Policy["tvRatings"] })}><option value="TV_G_PG">TV-G and TV-PG</option><option value="TV_G">TV-G only</option></select></label><label>Film / TV from<input inputMode="numeric" maxLength={4} value={eraFrom} placeholder="Any year" onChange={(e) => setEraFrom(e.target.value)} /></label><label>Film / TV to<input inputMode="numeric" maxLength={4} value={eraTo} placeholder="Any year" onChange={(e) => setEraTo(e.target.value)} /></label></div><p className="small-note">Unknown ratings are held. Music suggestions are artist-level; era and content ratings do not apply. Ratings do not establish suitability.</p></fieldset></details>
@@ -196,7 +177,7 @@ function Discovery({ candidate: c, busy, full, feedback, previous, previousQlooR
   const extraReview = needsReview(c);
   return <article className={`candidate-card ${extraReview ? "review-card" : ""}`}>
     <div className="card-top"><span className="category-label">{categoryName[c.kind]}{c.year ? ` · ${c.year}` : ""}</span><span className="rating-label">{c.kind === "artist" ? "Artist-level" : c.contentRating || "Rating unknown"}</span></div>
-    <h4>{c.name}</h4><p className="blurb">{c.blurb || "Qloo did not return a description. Please check a source before choosing this activity."}</p>
+    <div className="candidate-heading"><EntityImage src={c.imageUrl} kind={c.kind} /><h4>{c.name}</h4></div><p className="blurb">{c.blurb || "Qloo did not return a description. Please check a source before choosing this activity."}</p>
     <div className="evidence"><strong>Connected to your favourites</strong>{c.provenance.explainability === "available" ? <ul>{c.provenance.attribution.map((a) => <li key={a.signalEntityId}>{a.signalName}</li>)}</ul> : <p>Qloo did not provide usable input attribution for this item.</p>}<small>Qloo’s group-level taste connection; it does not explain an individual preference.</small><details><summary>Qloo source details</summary><p>Request {c.provenance.requestId}</p>{c.provenance.attribution.map((a) => <p key={a.signalEntityId}>{a.signalName} · {a.signalEntityId}{a.contribution !== undefined ? ` · input influence ${a.contribution.toFixed(3)}` : " · influence not returned"}</p>)}</details></div>
     <p className="rank-note">Qloo rank #{c.provenance.qlooRank} in {categoryName[c.kind].toLowerCase()} · Selected position #{c.provenance.selectedRank}{previousQlooRank !== undefined ? ` · Previous Qloo #${previousQlooRank}` : ""}{previous ? ` · Previous selected #${previous.provenance.selectedRank}` : ""}</p>
     {c.ratingGate === "held" && <p className="notice">Rating held. This item cannot enter this session. Choose another discovery.</p>}

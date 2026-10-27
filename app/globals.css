@@ -155,6 +155,19 @@ button.primary-button:hover:enabled, button.accept-button:hover:enabled { backgr
 .search-results small { display: block; color: var(--muted); }
 .search-results p { font-size: 13px; margin-bottom: 0; }
 .search-results button { flex-shrink: 0; max-width: 125px; }
+.search-match { display: flex; align-items: flex-start; gap: 14px; flex: 1; min-width: 0; }
+.result-copy { min-width: 0; overflow-wrap: anywhere; }
+.entity-image { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 72px; flex: 0 0 64px; border-radius: 7px; overflow: hidden; background: #e5e9dc; color: #57715a; }
+.entity-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.entity-image > span { font-family: Georgia, serif; font-size: 32px; }
+.entity-image-film { background: #e9dfcd; color: #806547; }
+.candidate-heading { display: flex; align-items: center; gap: 16px; margin-block: 16px; }
+.candidate-heading h4 { margin: 0; }
+.candidate-heading .entity-image { width: 76px; height: 86px; flex-basis: 76px; }
+.search-status:empty { display: none; }
+.new-session-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex: 0 0 180px; }
+.new-session-actions .text-button { font-size: 11px; }
+@media (max-width: 520px) { .library-heading { flex-direction: column; } .new-session-actions { flex: auto; align-items: flex-start; } .entity-image { width: 54px; height: 62px; flex-basis: 54px; } }
 .anchors { display: flex; flex-wrap: wrap; gap: 7px; }
 .anchor-chip { display: inline-flex; align-items: center; gap: 7px; padding-left: 12px; border: 1px solid #c5d1b8; background: #e9efdf; border-radius: 8px; font-size: 13px; }
 .anchor-chip button { border: 0; background: transparent; font-size: 20px; padding-inline: 10px; }

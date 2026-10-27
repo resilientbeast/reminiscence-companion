@@ -1,11 +1,11 @@
 import { requireUser } from "../../../lib/auth";
-import { createSession, listSessions } from "../../../lib/session-store";
+import { createSession, readWorkspace } from "../../../lib/session-store";
 import { saveSessionSchema } from "../../../lib/saved-session-contracts";
 import { errorResponse, jsonHeaders, readRequest } from "../../../lib/http";
 
 export const runtime = "nodejs";
 export async function GET() {
-  try { return Response.json({ sessions: await listSessions(await requireUser()) }, { headers: jsonHeaders }); }
+  try { return Response.json(await readWorkspace(await requireUser()), { headers: jsonHeaders }); }
   catch (error) { return errorResponse(error); }
 }
 export async function POST(request: Request) {

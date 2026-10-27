@@ -4,6 +4,7 @@ import { Firestore } from "@google-cloud/firestore";
 import { savedSessionIdSchema, savedSnapshotSchema, sessionTitle } from "./saved-session-contracts.ts";
 import type { SavedSession, SavedSnapshot, SessionSummary } from "./saved-session-contracts.ts";
 import { ServiceError } from "./qloo.ts";
+import { deriveSessionMemory } from "./session-memory.ts";
 
 let instance: Firestore | undefined;
 function database() {
@@ -24,9 +25,10 @@ function summary(session: SavedSession): SessionSummary {
 function record(id: string, snapshot: SavedSnapshot, revision: number): SavedSession {
   return { id, snapshot, title: sessionTitle(snapshot), updatedAt: new Date().toISOString(), revision, activityCount: snapshot.accepted.length, minutes: snapshot.accepted.reduce((sum, item) => sum + item.suggestedMinutes, 0), phase: snapshot.phase };
 }
-export async function listSessions(userId: string) {
+export async function readWorkspace(userId: string) {
   const rows = await owner(userId).collection("sessions").orderBy("updatedAt", "desc").limit(20).get();
-  return rows.docs.map(row => summary(row.data() as SavedSession));
+  const sessions = rows.docs.map(row => row.data() as SavedSession);
+  return { sessions: sessions.map(summary), memory: deriveSessionMemory(sessions) };
 }
 export async function getSession(userId: string, id: string) {
   const row = await document(userId, id).get();

@@ -37,11 +37,15 @@ export class RunBudget {
 type Json = Record<string, unknown>;
 function record(value: unknown): Json { return value && typeof value === "object" && !Array.isArray(value) ? value as Json : {}; }
 function text(value: unknown, max = 1600): string { return typeof value === "string" ? value.trim().slice(0, max) : ""; }
+function imageUrl(value: unknown) {
+  try { const url = new URL(text(value, 2048)); return url.protocol === "https:" && !url.username && !url.password ? url.href : undefined; }
+  catch { return undefined; }
+}
 const uuid = z.uuid();
 const urn: Record<Kind, string> = { artist: "urn:entity:artist", film: "urn:entity:movie", tv: "urn:entity:tv_show" };
 
 export type Entity = {
-  id: string; name: string; kind: Kind; year?: number; contentRating?: string;
+  id: string; name: string; kind: Kind; year?: number; contentRating?: string; imageUrl?: string;
   blurb: string; genres: string[]; spotifyArtistId?: string;
   notableSong?: string;
   fields: Record<string, string>;
@@ -85,7 +89,7 @@ export function normalizeEntity(value: unknown, expectedKind?: Kind): Entity | n
   const year = typeof props.release_year === "number" && Number.isInteger(props.release_year) ? props.release_year : undefined;
   const contentRating = text(props.content_rating, 30) || undefined;
   const notableSong = Array.isArray(props.notable_songs) ? text(props.notable_songs.find((song) => typeof song === "string"), 200) || undefined : undefined;
-  const entity: Entity = { id, name, kind, blurb, genres, fields, notableSong, ...(year ? { year } : {}), ...(contentRating ? { contentRating } : {}),
+  const entity: Entity = { id, name, kind, blurb, genres, fields, notableSong, imageUrl: imageUrl(record(props.image).url), ...(year ? { year } : {}), ...(contentRating ? { contentRating } : {}),
     ...(kind === "artist" && /^[A-Za-z0-9]{22}$/.test(spotifyId) ? { spotifyArtistId: spotifyId } : {}) };
   return entity;
 }
@@ -102,7 +106,7 @@ export function candidateFromEntity(entity: Entity, raw: unknown, rank: number, 
   const gate = evaluateCandidatePolicy({ qlooEntityId: entity.id, ...entity }, state);
   return candidateSchema.parse({
     qlooEntityId: entity.id, name: entity.name, kind: entity.kind, year: entity.year, contentRating: entity.contentRating,
-    genres: entity.genres, blurb: entity.blurb, blurbSource: "qloo", spotifyArtistId: entity.spotifyArtistId,
+    genres: entity.genres, imageUrl: entity.imageUrl, blurb: entity.blurb, blurbSource: "qloo", spotifyArtistId: entity.spotifyArtistId,
     playbackUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(entity.name + (entity.kind === "artist" ? ` ${entity.notableSong || "music"}` : ` ${entity.year || ""} trailer`))}`,
     provenance: { runId: budget.runId, requestId, qlooRank: rank, explainability: attribution.length ? "available" : "unavailable", attribution },
     screening: { status: "not_run", flags: [] }, ratingGate: gate.eligible ? "eligible" : "held", review: "pending", familiarity: "unknown",

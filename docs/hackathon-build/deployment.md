@@ -6,7 +6,7 @@ Public app: **[Reminiscence Companion](https://reminiscence-companion-7126385771
 
 ## Current account-stage release
 
-The user authorized Clerk signup/login, a clear landing page, and private sessions that reopen across devices. The development application has been claimed and linked to the user's Clerk account. Development mode is intentional; production Clerk configuration is separate work.
+The user authorized Clerk signup/login, a clear landing page, and private sessions that reopen across devices. The development application has been claimed and linked to the user's Clerk account. The user explicitly chose development mode for this hackathon; production Clerk migration is out of scope.
 
 | Setting | Verified value |
 | --- | --- |
@@ -22,7 +22,7 @@ The user authorized Clerk signup/login, a clear landing page, and private sessio
 
 Builds ran remotely with local Docker stopped. The tagged preview passed 35 offline checks, production compilation, 15 live checks with two Clerk accounts, browser save/finish/reload/reopen with actual cultural data, HTTP isolation and 12-asset credential checks before promotion. The public URL then returned 200 with explicit audience text and configured account/storage health; anonymous saved-session access returned 401. Traffic, runtime identity and image digest were read back from Cloud Run. Detailed boundaries and limits are in [accounts.md](accounts.md).
 
-Saving is explicit and account-scoped; updates check revisions and deletion is available. Records do not contain recipient identity/health fields, discovery pools or traces. A production Clerk instance, automatic purge after Clerk account deletion, a new phone-width/physical-device check and independent caregiver review remain future work. No new medical or superiority claims are made.
+Saving is explicit and account-scoped; updates check revisions and deletion is available. Records do not contain recipient identity/health fields, discovery pools or traces. Automatic purge after Clerk account deletion, a new phone-width/physical-device check and independent caregiver review remain future work. Clerk development mode is the chosen demo configuration. No new medical or superiority claims are made.
 
 ## Earlier account-free release (historical)
 

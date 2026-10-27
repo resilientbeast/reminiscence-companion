@@ -17,7 +17,7 @@ The demo's key moment: confirm a favourite → inspect source evidence → rejec
   What to build: Server-only key loading, typed search/Insights adapters and a confirmation UI. Probe an upstream TV rating parameter before using it; metadata lookup initially reuses returned records.
   Acceptance: English and Chinese presets resolve to the correct confirmed kind; ambiguous/unsupported seeds produce a choice/recovery state; errors are redacted and budgets apply.
   Verify: A bounded live smoke command using local credentials; invalid input/auth/empty-result tests without publishing captured responses.
-  Result: All five presets resolved to exact expected names/kinds through `/api/search`, including Lata Mangeshkar and 鄧麗君. Browser confirmation checked Sinatra, The Sound of Music and I Love Lucy. Search is an explicit submit/preset-prefill interaction; search-as-you-type and result imagery are not implemented. Unverified upstream TV-rating filters are not sent; returned ratings are gated in code.
+  Result: All five presets resolved to exact expected names/kinds through `/api/search`, including Lata Mangeshkar and 鄧麗君. Browser confirmation checked Sinatra, The Sound of Music and I Love Lucy. The initial build used explicit submit/preset-prefill. The later demo refinement adds debounced search-as-you-type and Qloo-supplied result imagery. Unverified upstream TV-rating filters are not sent; returned ratings are gated in code.
 
 - [x] **3. Gemini tool-calling spike**
   Spec ref: Section 3, T4, Section 10.
@@ -83,6 +83,6 @@ The demo's key moment: confirm a favourite → inspect source evidence → rejec
 - [x] Development Clerk application claimed into the user's account; keys remain local/server-side except the intentionally public publishable key.
 - [x] 35 offline checks, production build, 15 hosted account-isolation checks, actual browser save/finish/reload/reopen, runtime key injection and asset/credential isolation.
 - [x] Cloud Run release `reminiscence-companion-accts-209485e` promoted to 100% of the existing public URL; resource/spend controls retained and local Docker stopped.
-- [ ] Production Clerk configuration, account-deletion webhook/purge, fresh phone/physical-device/accessibility checks, caregiver review and existing print/audio verification remain future work.
+- [ ] Account-deletion webhook/purge, fresh phone/physical-device/accessibility checks, caregiver review and existing print/audio verification remain future work. The user explicitly chose Clerk development mode for the hackathon; production migration is out of scope.
 
 See `accounts.md` and `deployment.md` for evidence, exact source/image and limitations.
