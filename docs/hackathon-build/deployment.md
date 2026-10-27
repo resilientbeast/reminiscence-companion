@@ -2,9 +2,29 @@
 
 Verified on 27 October 2026 (Singapore time).
 
-Public app: **[Reminiscence Companion](https://reminiscence-companion-712638577178.us-central1.run.app/)**. It requires no account or API key from the caregiver.
+Public app: **[Reminiscence Companion](https://reminiscence-companion-712638577178.us-central1.run.app/)**. The landing page explains its dementia-caregiver audience and workflow. Clerk accounts provide private saved sessions; the complete temporary demo at `/demo` requires no account or API key from the caregiver.
 
-## Released artifact
+## Current account-stage release
+
+The user authorized Clerk signup/login, a clear landing page, and private sessions that reopen across devices. The development application has been claimed and linked to the user's Clerk account. Development mode is intentional; production Clerk configuration is separate work.
+
+| Setting | Verified value |
+| --- | --- |
+| Ready / 100% traffic revision | `reminiscence-companion-accts-209485e` |
+| Runtime source commit | `209485e1ebfda037850c37f83fc91011cc6f1216` |
+| Immutable image digest | `sha256:5b757597dbb83503a64e7dcf469c5406a998417a5697f7d65173f2e16f2a3b11` |
+| Artifact repository | `us-central1-docker.pkg.dev/reminiscence-qloo-20261027/reminiscence/app` |
+| Cloud Build | `bf8e8fbc-5625-447b-b7ee-c0f5e0a06c1b` |
+| Runtime identity | Existing dedicated `reminiscence-runtime` account |
+| Secret references | `qloo-api-key:1`, `gemini-api-key:1`, `clerk-secret-key:1` |
+| Saved sessions | Private Firestore Standard Native `(default)` database, `us-central1` |
+| Resources / spend settings | Existing 1 CPU / 512 MiB, concurrency 2, min 0 / max 1; original project alerts and Gemini cap retained |
+
+Builds ran remotely with local Docker stopped. The tagged preview passed 35 offline checks, production compilation, 15 live checks with two Clerk accounts, browser save/finish/reload/reopen with actual cultural data, HTTP isolation and 12-asset credential checks before promotion. The public URL then returned 200 with explicit audience text and configured account/storage health; anonymous saved-session access returned 401. Traffic, runtime identity and image digest were read back from Cloud Run. Detailed boundaries and limits are in [accounts.md](accounts.md).
+
+Saving is explicit and account-scoped; updates check revisions and deletion is available. Records do not contain recipient identity/health fields, discovery pools or traces. A production Clerk instance, automatic purge after Clerk account deletion, a new phone-width/physical-device check and independent caregiver review remain future work. No new medical or superiority claims are made.
+
+## Earlier account-free release (historical)
 
 | Setting | Verified value |
 | --- | --- |
@@ -19,7 +39,7 @@ Public app: **[Reminiscence Companion](https://reminiscence-companion-7126385771
 | Gemini | Direct Google API, `gemini-3.8-flash`, project-specific key restricted to its API |
 | Public access | Only the Cloud Run invoker role is granted to anonymous users |
 
-The image was built from the recorded source commit with the matching OCI revision label. Later documentation/test-only commits do not change the deployed application. No source repository or Devpost submission has been published by this deployment.
+This earlier image was built from the recorded source commit with the matching OCI revision label. It has been superseded by the account-stage release above. No source repository or Devpost submission has been published by these deployments.
 
 ## Staged verification
 

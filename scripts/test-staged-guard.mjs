@@ -22,7 +22,14 @@ try {
   const stagedOnly = spawnSync(process.execPath, ["scripts/check-public-artifacts.mjs", "--staged"], { env: environment, encoding: "utf8" });
   assert.equal(stagedOnly.status, 1, "A synthetic credential in a staged-only blob must be rejected even without a working file.");
   assert.ok(stagedOnly.stderr.includes("staged: guard-synthetic.txt"));
-  console.log("Staged guard passed: private paths and a synthetic credential in a staged-only blob were rejected. The real index was not changed.");
+  for (const [prefix, expected] of [["sk_test_", 1], ["pk_test_", 0]]) {
+    const value = prefix + "x".repeat(32);
+    const blob = execFileSync("git", ["hash-object", "-w", "--stdin"], { input: value, encoding: "utf8" }).trim();
+    execFileSync("git", ["update-index", "--add", "--cacheinfo", `100644,${blob},guard-synthetic.txt`], { env: environment });
+    const check = spawnSync(process.execPath, ["scripts/check-public-artifacts.mjs", "--staged"], { env: environment, encoding: "utf8" });
+    assert.equal(check.status, expected, "Clerk secret keys must be rejected; publishable keys are intentionally public.");
+  }
+  console.log("Staged guard passed: private paths and staged Google/Clerk secrets were rejected; Clerk publishable keys were allowed. The real index was not changed.");
 } finally {
   // Exact task-created paths only; preserve all existing private research.
   await rm(fixture, { force: true });

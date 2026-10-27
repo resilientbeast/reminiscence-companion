@@ -74,3 +74,15 @@ The demo's key moment: confirm a favourite → inspect source evidence → rejec
   What to build: Public source with detected MIT license and clean setup, English description, start date, tested public app/repo URLs and supporting screenshots. Video is optional.
   Acceptance: Required form answers are complete and supported by the actual app. No private artifacts or credentials are published. Submission follows the user's explicit authorization and live requirements.
   Verify: Clean install, repository/secret review, public app test and final Devpost readiness check before submission. Record the submitted release and re-test the live URL.
+
+## Account-stage release — 27 October 2026
+
+- [x] Explicit landing-page audience: caregivers of people living with dementia; purpose, four-step workflow, illustrative activities and practical limitations.
+- [x] Clerk signup/login, authenticated personal workspace, account-aware navigation and a full guest demo.
+- [x] Private Firestore saved-session list/create/reopen/update/delete; owner derived from verified authentication; 20-session cap and stale-update protection.
+- [x] Development Clerk application claimed into the user's account; keys remain local/server-side except the intentionally public publishable key.
+- [x] 35 offline checks, production build, 15 hosted account-isolation checks, actual browser save/finish/reload/reopen, runtime key injection and asset/credential isolation.
+- [x] Cloud Run release `reminiscence-companion-accts-209485e` promoted to 100% of the existing public URL; resource/spend controls retained and local Docker stopped.
+- [ ] Production Clerk configuration, account-deletion webhook/purge, fresh phone/physical-device/accessibility checks, caregiver review and existing print/audio verification remain future work.
+
+See `accounts.md` and `deployment.md` for evidence, exact source/image and limitations.

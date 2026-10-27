@@ -4,7 +4,7 @@ A practical activity planner for family caregivers supporting someone living wit
 
 ## Current status
 
-The account-stage build adds a landing page explaining the dementia-caregiver audience and workflow, Clerk signup/login, and private Firestore saved sessions. `/workspace` is authenticated; `/demo` retains the complete temporary planning flow without signup. Saving is explicit, each account can hold 20 sessions, and revision checks prevent silent overwrites from an older tab. See [account setup and verification](docs/hackathon-build/accounts.md). The deployment record distinguishes the released artifact from work in progress.
+The [live app](https://reminiscence-companion-712638577178.us-central1.run.app/) now includes a landing page explaining the dementia-caregiver audience and workflow, Clerk signup/login, and private Firestore saved sessions. `/workspace` is authenticated; `/demo` retains the complete temporary planning flow without signup. Saving is explicit, each account can hold 20 sessions, and revision checks prevent silent overwrites from an older tab. The claimed Clerk application is in development mode. See [account setup and verification](docs/hackathon-build/accounts.md) and the [exact released artifact](docs/hackathon-build/deployment.md).
 
 The [public app](https://reminiscence-companion-712638577178.us-central1.run.app/) supports live Qloo search and exact-match confirmation, bounded Gemini tool use, grounded advisory content checks, explicit acceptance, favourite/rejection feedback, before/after ranking evidence, and an ordered two- or three-activity session with start/finish and print controls. Rating-held results cannot enter a session. Missing/failed screening stays visible for caregiver review.
 
