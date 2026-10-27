@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtemp, writeFile, rm, rmdir } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile, rm, rmdir } from "node:fs/promises";
 import path from "node:path";
 
+await mkdir(path.join(process.cwd(), "qloo-private"), { recursive: true });
 const directory = await mkdtemp(path.join(process.cwd(), "qloo-private", "guard-check-"));
 const index = path.join(directory, "index");
 const fixture = path.join(directory, "synthetic.txt");

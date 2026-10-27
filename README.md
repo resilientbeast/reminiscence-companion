@@ -4,9 +4,9 @@ A caregiver-guided activity planner built around confirmed favourites and option
 
 ## Current status
 
-The local app now supports live Qloo search and exact-match confirmation, bounded Gemini tool use, grounded advisory content checks, explicit acceptance, favourite/rejection feedback, before/after ranking evidence, and an ordered two- or three-activity session with start/finish and print controls. Rating-held results cannot enter a session. Missing/failed screening stays visible for caregiver review.
+The [public app](https://reminiscence-companion-712638577178.us-central1.run.app/) supports live Qloo search and exact-match confirmation, bounded Gemini tool use, grounded advisory content checks, explicit acceptance, favourite/rejection feedback, before/after ranking evidence, and an ordered two- or three-activity session with start/finish and print controls. Rating-held results cannot enter a session. Missing/failed screening stays visible for caregiver review.
 
-Gemini uses the direct Google provider with `gemini-3.8-flash`. A real Linux-container run completed in 12.9 seconds with two agent rounds and one content screen. This is one integration observation, not a latency promise. Container build/runtime checks pass; caregiver task review, public hosting and submission remain release work. See the build notes for the exact verified scope.
+Gemini uses the direct Google provider with `gemini-3.8-flash`. Linux-container and staged Cloud Run checks pass, including the public browser workflow. Observed runs varied, and a timeout correctly used the labelled fallback; no latency promise is made. Caregiver review, public repository publication and submission remain release work. See the [deployment record](docs/hackathon-build/deployment.md) for exact evidence and limits.
 
 ## Local setup
 
@@ -86,7 +86,9 @@ docker build -t reminiscence-companion .
 docker run --rm -p 8080:8080 reminiscence-companion
 ```
 
-The container uses standalone Next.js, runs as UID 1001 and binds port 8080. Build, HTTP smoke, private-path/environment isolation and one real Qloo/Gemini run passed. Inject provider keys at runtime, for example with `--env-file .env.local`; none are baked into the checked image. `.dockerignore` excludes secrets/private research. The current local preview uses a task-owned `reminiscence-preview` container bound only to `127.0.0.1:3000`; stop it before starting another server on that port. Actual provider budget/quota settings and external deployment remain release requirements. See the [prepared Cloud Run plan](docs/hackathon-build/release-plan.md); no public deployment is claimed.
+The container uses standalone Next.js, runs as UID 1001 and binds port 8080. Build, HTTP smoke, private-path/environment isolation and real Qloo/Gemini checks passed. Inject keys at runtime, for example with `--env-file .env.local`; none are baked into the checked image. `.dockerignore` excludes secrets/private research. The local `reminiscence-preview` container uses `127.0.0.1:3000`; stop it before starting another server on that port.
+
+Cloud Run is live in `us-central1`, with a project-specific Gemini key and pinned Secret Manager versions. A US$3 monthly Gemini cap and US$10 project billing alerts are configured; they are not an exact spending ceiling. The user kept the existing billing mode despite Google's prepay migration notice, which remains an availability risk. See the [release record](docs/hackathon-build/deployment.md) and [approved plan](docs/hackathon-build/release-plan.md). No automatic shutdown or Devpost submission is scheduled.
 
 ## Build documents
 

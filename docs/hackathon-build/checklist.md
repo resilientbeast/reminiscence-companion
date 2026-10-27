@@ -1,7 +1,7 @@
 # Build checklist
 
 
-Execution: the local Qloo/Gemini loop passed live API/browser checks and Linux-container verification. Provider adapter uses Google directly. Print output, audible playback, caregiver review and public deployment remain unverified. The user selected a new dedicated Cloud project; the concrete release plan awaits billing/public-access authorization. No cloud resources, source publication or submission have been created.
+Execution: Cloud Run deployment is live under the user's explicit approval, with verified project cap/alerts, pinned secrets and public workflow checks. See `deployment.md`. Print output, audible playback, physical-phone/accessibility checks and independent caregiver review remain unverified. Source is committed locally but not published; no Devpost submission occurred. The user's choice to retain current billing despite Google's prepay migration notice is recorded as an availability risk.
 
 The demo's key moment: confirm a favourite → inspect source evidence → reject a discovery → see the exclusion → accept and finish a small session. Documentation tracks actual completion, not planned capability.
 
@@ -53,6 +53,7 @@ The demo's key moment: confirm a favourite → inspect source evidence → rejec
   Acceptance: A caregiver can complete the workflow; no rejected/unaccepted item appears in the session; no autoplay or music-era claims; unavailable playback has a usable fallback.
   Verify: Keyboard/phone layout and print checks; test audible playback if the browser supports it, otherwise record the limitation.
   Progress: Browser start → Worked well → finish passed; phone width 390 px showed no horizontal overflow. Click-to-load Spotify and source-derived YouTube links are implemented. Confirmed favourites can enter only after explicit review. Actual print output and audible playback remain unverified; the IAB print invocation timed out without a verified preview. Tall desktop sessions now scroll within the sidebar.
+  Hosted result: The public flow also passed edits/order/start/observed feedback/finish. The official Spotify iframe rendered the correct artist and preview list on explicit load. Emulated phone layout passed; audible playback, real printed output and physical-device checks are still not claimed.
 
 - [ ] **8. Task review and fair evaluation**
   Spec ref: Section 10; T13.
@@ -65,7 +66,8 @@ The demo's key moment: confirm a favourite → inspect source evidence → rejec
   What to build: Build/run the standalone container, configure the chosen Cloud project/secrets, bounded usage controls and external judge access.
   Acceptance: Full flow works from a private phone browser; normal ten-session use is not blocked; no key is in the client/image context; access remains available through November 7 noon Singapore time.
   Verify: Docker build/run, deployed health and full-flow checks, real budget/quota configuration, cold/warm timing and release-commit consistency. Obtain any required external-operation authorization at the concrete deployment boundary.
-  Progress: Docker engine started; Linux image built and runs as UID 1001. No-key smoke/private-file/environment checks passed. Runtime-injected keys completed three live preset searches plus an agent run (3 Qloo, 2 agent, 1 screen; six completed checks; 12935 ms). Local preview now serves that image. Thirty offline checks, a ten-session admission-allowance test and isolated staged-guard tests pass. Cloud creation/billing/IAM/caps/deployment remain pending the reviewed release plan.
+  Container checkpoint: Docker engine started; Linux image built and runs as UID 1001. No-key smoke/private-file/environment checks passed. Runtime-injected keys completed three live preset searches plus an agent run (3 Qloo, 2 agent, 1 screen; six completed checks; 12935 ms). Thirty offline checks, a ten-session admission-allowance test and isolated staged-guard tests passed. At that checkpoint cloud provisioning was still pending; the later hosted result follows.
+  Hosted result: Dedicated project and public revision `347a51d` are deployed. Private five-preset and agent/exclusion checks passed before public access. Public UI and nine-asset credential checks passed; verified cap is US$3/month plus US$10 project alerts. One public refresh used fallback; a warm retry completed in 17.3 seconds. Physical-phone and representative cold-start/throughput checks remain unverified, so this checklist item is not represented as fully audited.
 
 - [ ] **10. Public release and Devpost handoff**
   Spec ref: Hard requirements; T13–T14.

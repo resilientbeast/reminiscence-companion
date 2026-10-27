@@ -14,6 +14,8 @@ One developer-operated browser rehearsal exercised live app data. It is implemen
 | Phone/keyboard | Phone-width layout had no horizontal overflow; keyboard finish worked. A tall desktop sidebar issue was found, fixed with internal scrolling, and its finish button subsequently worked by mouse. This is not an accessibility audit. |
 | Print/media | Actual print output and audible playback are unverified. |
 
+The same developer-operated workflow was later rehearsed against public Cloud Run: a reviewed Sinatra starting activity plus Nat King Cole, positive/rejection feedback and reordering, stable refresh, activity/time edits and finish. Held TV-MA acceptance was disabled. One refresh used the labelled timeout fallback; one warm retry completed in agent mode. The Spotify preview rendered and emulated phone width fitted. These deployment checks still provide no independent participant comprehension, task-time or caregiver-benefit evidence. See `deployment.md`.
+
 ## Next participant task
 
 Recruit available family caregivers, or explicitly label non-caregivers as proxy testers. Do not collect recipient identifiers, diagnoses or care notes. Use fictional cultural anchors and ask the participant to:

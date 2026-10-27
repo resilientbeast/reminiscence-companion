@@ -1,6 +1,6 @@
-# Cloud Run release plan — prepared, not executed
+# Cloud Run release plan — approved, with deployment recorded
 
-The user chose a new dedicated project. No project, billing link, cloud secret, API key, registry, public service or Devpost submission has been created. The available open billing account is named **My Billing Account**. Creating the deployment requires explicit approval of billing use and public access after the local container checks.
+The user approved the staged Cloud Run deployment on 27 October 2026. The dedicated project, billing link, registry, restricted runtime identity, secrets and public service are created. The existing billing account is named **My Billing Account**; unrelated projects were not changed. Verified settings, source/digest and evidence are recorded in [deployment.md](deployment.md). No public source repository or Devpost submission was created.
 
 ## Proposed resources
 
@@ -12,12 +12,12 @@ The user chose a new dedicated project. No project, billing link, cloud secret, 
 | Image | Locally verified build, uploaded under a release tag, then resolved to an immutable digest before deployment |
 | Runtime | 1 CPU, 512 MiB memory, port 8080, 30-second platform timeout |
 | Scaling | Minimum 0, service maximum 1, request concurrency 2 |
-| Access | Private during provisioning/verification; public judge access only after limits and the live flow are checked |
+| Access | Private during provisioning/verification; now public after the checks |
 | Runtime identity | Dedicated `reminiscence-runtime` service account, with accessor permission on only the two app secrets |
 | Keys | Qloo and dedicated-project Gemini credentials in Secret Manager; pinned secret versions, no keys in the image or command arguments |
 | Availability | Keep judge access through 7 November 2026, noon Singapore time; removal requires a separate decision |
 
-Proposed planning budget: **US$10 total for this demo period**, subject to user approval. This is a target, not a guaranteed charge ceiling. Prepare a small Gemini project spend cap plus Cloud Billing alerts; verify the actual controls in the account before enabling public access. Do not change billing settings or credentials for the unrelated existing projects.
+Approved planning target: **US$10 total for this demo period**. Project-only alerts at 50/90/100% are active, and a US$3 monthly Gemini project cap was verified in AI Studio. The period spans two monthly caps; enforcement can lag. This is not a guaranteed total ceiling. Unrelated projects' settings/credentials were not changed. Google requested an account-wide prepay migration; the user chose to keep the current billing mode.
 
 Google recommends Secret Manager and pinned versions for environment-injected secrets. ([Cloud Run secret configuration](https://docs.cloud.google.com/run/docs/configuring/services/secrets))
 
@@ -32,7 +32,7 @@ Gemini caps/quotas belong to the key's project, so using an existing unrelated-p
 - No automatic retry of failed model calls, bounded JSON bodies and source pool, same-origin browser request checks, no-store responses and redacted upstream errors.
 - Local Git pre-commit guard scans working assets and staged blobs; it rejects private research/config paths even if force-staged. No publication is part of this check.
 
-## Provisioning sequence after approval
+## Approved provisioning sequence
 
 1. Confirm project ID availability and the selected billing account. Create the dedicated project and link that account. Enable only the Cloud Run, Artifact Registry, Secret Manager and Gemini/key-management APIs needed for the chosen credentials.
 2. Create the registry and runtime identity. Store keys using stdin, never shell arguments or committed files. Create/use a Gemini key associated with the dedicated project and restricted to its API; keep the existing local key for other work unchanged.
@@ -43,4 +43,4 @@ Gemini caps/quotas belong to the key's project, so using an existing unrelated-p
 
 ## Still to verify
 
-Actual cloud creation/billing/IAM/limits and deployment are not executed. Actual print output, audible playback, accessibility audit and caregiver task review are not established by the local workflow checks. The earlier plain-LLM comparison was exploratory; it does not establish an advantage for Qloo or validate this product for caregivers.
+Cloud resources, billing alerts, project cap, private verification and public deployment are complete as recorded in the release record. Actual print output, audible playback, physical-phone/accessibility audits and independent caregiver review remain unverified. The earlier plain-LLM comparison was exploratory; it does not establish an advantage for Qloo or validate this product for caregivers. No payment-mode change or credit purchase was made, and no automatic shutdown is scheduled.
