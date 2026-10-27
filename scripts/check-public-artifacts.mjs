@@ -12,7 +12,7 @@ for (const name of [".env", ".env.local", ".env.txt"]) {
   try { content = await fs.readFile(path.join(root, name), "utf8"); } catch (error) { if (error.code === "ENOENT") continue; throw error; }
   for (const line of content.split(/\r?\n/)) {
     const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
-    if (!match || !/KEY|TOKEN|SECRET/.test(match[1]) || match[1] === "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY") continue;
+    if (!match || !/KEY|TOKEN|SECRET/.test(match[1]) || ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "CLERK_PUBLISHABLE_KEY"].includes(match[1])) continue;
     const value = match[2].replace(/^(['"])(.*)\1$/, "$2");
     if (value.length >= 16) secrets.push(value);
   }

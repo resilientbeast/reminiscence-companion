@@ -212,4 +212,3 @@ function MediaLink({ candidate }: { candidate: Candidate }) {
   const [loaded, setLoaded] = useState(false);
   return <div className="media-links">{candidate.playbackUrl && <a href={candidate.playbackUrl} target="_blank" rel="noopener noreferrer">Search YouTube <span aria-hidden="true">↗</span></a>}{candidate.spotifyArtistId && <><button className="text-button no-print" type="button" onClick={() => setLoaded(!loaded)}>{loaded ? "Close Spotify" : "Load Spotify preview"}</button>{loaded && <iframe title={`${candidate.name} on Spotify`} src={`https://open.spotify.com/embed/artist/${candidate.spotifyArtistId}`} width="100%" height="152" loading="lazy" allow="encrypted-media; fullscreen; picture-in-picture" />}</>}<small>External media availability varies. You choose whether to play.</small></div>;
 }
-
