@@ -1,5 +1,6 @@
 import "server-only";
 import { ServiceError } from "./qloo.ts";
+import { ZodError } from "zod";
 
 export const jsonHeaders = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
 export async function readRequest(request: Request, maxBytes = 20_000) {
@@ -25,5 +26,10 @@ export async function readRequest(request: Request, maxBytes = 20_000) {
 }
 export function errorResponse(error: unknown) {
   if (error instanceof ServiceError) return Response.json({ error: error.message, code: error.code }, { status: error.status, headers: jsonHeaders });
-  return Response.json({ error: "The request could not be completed. Check your choices and try again.", code: "request_failed" }, { status: 400, headers: jsonHeaders });
+  if (error instanceof ZodError) return Response.json({ error: "The request could not be completed. Check your choices and try again.", code: "request_failed" }, { status: 400, headers: jsonHeaders });
+  // Metadata only: never log request bodies, identifiers or raw upstream messages.
+  const failure = error instanceof Error ? error : undefined;
+  const code = failure && "code" in failure && typeof failure.code === "number" ? failure.code : undefined;
+  console.error(JSON.stringify({ event: "request_service_failure", name: failure?.name || "UnknownError", code, frames: failure?.stack?.split("\n").filter(line => /^\s+at\s/.test(line)).slice(0, 3).map(line => line.trim()) }));
+  return Response.json({ error: "This service is unavailable right now. Your open session is still here. Please try again shortly.", code: "service_unavailable" }, { status: 503, headers: jsonHeaders });
 }

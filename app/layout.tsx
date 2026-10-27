@@ -18,7 +18,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         <a className="skip-link" href="#main">Skip to content</a>
-        {clerkConfigured() ? <ClerkProvider publishableKey={clerkPublishableKey()} signInUrl="/sign-in" signUpUrl="/sign-up" signInFallbackRedirectUrl="/workspace" signUpFallbackRedirectUrl="/workspace" afterSignOutUrl="/" appearance={{ variables: { colorPrimary: "#294f3e", colorBackground: "#fffef9", borderRadius: "0.65rem", fontFamily: "Arial, Helvetica, sans-serif" } }}>{children}</ClerkProvider> : children}
+        {clerkConfigured() ? <ClerkProvider
+          publishableKey={clerkPublishableKey()}
+          signInUrl="/sign-in" signUpUrl="/sign-up"
+          signInFallbackRedirectUrl="/workspace" signUpFallbackRedirectUrl="/workspace" afterSignOutUrl="/"
+          localization={{ signIn: { start: { title: "Log in to Reminiscence Companion", subtitle: "Continue to your private caregiver workspace." } }, signUp: { start: { title: "Create your caregiver account", subtitle: "Save your sessions and return to them any time." } } }}
+          appearance={{ variables: { colorPrimary: "#294f3e", colorBackground: "#fffef9", borderRadius: "0.65rem", fontFamily: "Arial, Helvetica, sans-serif" } }}
+        >{children}</ClerkProvider> : children}
       </body>
     </html>
   );
