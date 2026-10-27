@@ -46,7 +46,7 @@ export default function HomePage() {
           <p className="care-detail">A cultural connection does not establish a personal memory or predict enjoyment. Every activity stays your choice.</p>
         </aside>
       </main>
-      <footer className="site-footer"><span>Reminiscence Companion · local development preview</span><span>An activity aid for caregivers. Not medical advice or therapy. Follow the person&apos;s lead.</span></footer>
+      <footer className="site-footer"><span>Reminiscence Companion · hackathon preview</span><span>An activity aid for caregivers. Not medical advice or therapy. Follow the person&apos;s lead.</span></footer>
     </>
   );
 }
