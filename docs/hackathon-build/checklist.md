@@ -1,0 +1,74 @@
+# Build checklist
+
+
+Execution: the local Qloo/Gemini loop passed live API/browser checks and Linux-container verification. Provider adapter uses Google directly. Print output, audible playback, caregiver review and public deployment remain unverified. The user selected a new dedicated Cloud project; the concrete release plan awaits billing/public-access authorization. No cloud resources, source publication or submission have been created.
+
+The demo's key moment: confirm a favourite → inspect source evidence → reject a discovery → see the exclusion → accept and finish a small session. Documentation tracks actual completion, not planned capability.
+
+- [x] **1. Runnable foundation and contracts**
+  Spec ref: Sections 3, 5; T1.
+  What to build: Next.js/TypeScript/Tailwind scaffold, shared validated state/policy contracts, README, MIT license, env example, secret exclusions, health route and standalone Dockerfile.
+  Acceptance: Type-check and production build pass; homepage/health route work without provider keys; contract boundary checks pass; no secrets/private research in served assets. Record Docker availability explicitly.
+  Verify: `npm ci`, `npm run typecheck`, `npm test`, `npm run build`, HTTP smoke checks against a running production server. Container build/run is also required before item 9.
+  Result: Verified 27 October 2026: clean lockfile install, TypeScript, 9 boundary tests, production build/staging, credential scan and standalone HTTP smoke passed. Docker engine unavailable; container verification remains explicitly required at item 9. Browser visual/interaction checks remain unverified.
+
+- [x] **2. Live Qloo client and anchor resolution**
+  Spec ref: Sections 0, 4, 6; T2–T3.
+  What to build: Server-only key loading, typed search/Insights adapters and a confirmation UI. Probe an upstream TV rating parameter before using it; metadata lookup initially reuses returned records.
+  Acceptance: English and Chinese presets resolve to the correct confirmed kind; ambiguous/unsupported seeds produce a choice/recovery state; errors are redacted and budgets apply.
+  Verify: A bounded live smoke command using local credentials; invalid input/auth/empty-result tests without publishing captured responses.
+  Result: All five presets resolved to exact expected names/kinds through `/api/search`, including Lata Mangeshkar and 鄧麗君. Browser confirmation checked Sinatra, The Sound of Music and I Love Lucy. Search is an explicit submit/preset-prefill interaction; search-as-you-type and result imagery are not implemented. Unverified upstream TV-rating filters are not sent; returned ratings are gated in code.
+
+- [x] **3. Gemini tool-calling spike**
+  Spec ref: Section 3, T4, Section 10.
+  What to build: Gemini is selected; use direct `@ai-sdk/google`, default `gemini-3.8-flash` with an environment override, and pinned AI SDK/provider packages. Configure the local key and run `npm run spike:gemini` for a real validated tool-call round trip.
+  Acceptance: Structured tool arguments/result and missing-key behaviour are verified. Record model/version and timeout/call/token limits. Actual account quota/spend settings must be verified before deployment in item 9.
+  Verify: One small live spike; do not repeatedly spend quota on unchanged successful cases.
+  Result: Passed 27 October 2026 with `gemini-3.8-flash`: authenticated model catalogue HTTP 200, two real model rounds, one validated tool execution, 321 input/90 output tokens, 5016 ms. Five offline provider checks also passed. The full Qloo agent and account-budget configuration remain later work.
+
+- [x] **4. Bounded agent and independent fallback**
+  Spec ref: Section 4; T4, T6.
+  What to build: Current-run candidate pool, selection validator, immutable policy wrappers, total call/deadline budgets, partial results and a no-LLM fallback.
+  Acceptance: Outside-pool IDs and policy overrides cannot enter results; retries and parallel calls count against shared budgets; fallback does not call a missing model.
+  Verify: Meaningful boundary/failure-path tests plus one live preset. Do not require an arbitrary number of tool names.
+  Result: Live three-anchor run completed in 15305 ms: three Qloo calls, two agent rounds, one completed six-item screen. Browser feedback refresh completed in 15.7 seconds with the same call counts. Earlier cutoff and rejected thinking-setting cases exercised honest fallback. Compact server-mapped candidate keys reduce model output without losing Qloo ID provenance. Offline checks cover pool membership, shared limits, cancellation and no second call to a failed model.
+
+- [x] **5. Review states and grounded evidence**
+  Spec ref: Section 5; T6–T7.
+  What to build: Typed attribution, source field/excerpt flags, distinct rating/review/screening states and pending-review UI.
+  Acceptance: Unknown ratings/screens stay pending; flags cannot invent evidence; incomplete explainability is displayed honestly; nothing is auto-accepted.
+  Verify: Review cases covering a G-rated flagged item, a held R rating, TV ratings, no attribution and failed/insufficient screening.
+  Result: Live metadata flags rendered with field paths/exact excerpts. Synthetic checks cover a flagged G-rated film, R/unknown/legacy holds, separate TV sets, unavailable attribution, unsupported evidence and insufficient metadata. Flagged/incomplete checks need explicit acknowledgement; no item is auto-accepted. This is advisory metadata screening, not a content-suitability guarantee.
+
+- [x] **6. Feedback, stable accepted cards and changes**
+  Spec ref: T5; Section 4 step 7; Section 6.
+  What to build: Explicit acceptance, Known favourite, Worked well, rejection and temporary skip; browser-side before/after diff with both source and selected order.
+  Acceptance: Accepted cards persist across refresh; rejection excludes, acceptance alone makes no upstream call, and selector changes are not mislabelled as Qloo ranking changes.
+  Verify: Browser task plus request/state transition checks; inspect the actual sent parameters.
+  Result: Browser accepted Nat King Cole/Ella Fitzgerald, rejected Dean Martin and refreshed. The accepted order persisted, Dean disappeared, and the change panel showed two Qloo category-rank changes separately from one selected-position change. API smoke verified rejected/accepted exclusions. Parameter construction and positive signals are covered offline; no superiority or causal-rank claim is made.
+
+- [ ] **7. Finished session and media links**
+  Spec ref: T8–T11.
+  What to build: Two/three-item accepted session with activity/order, start/finish, basic print view, public-source media search links and optional click-to-load Spotify.
+  Acceptance: A caregiver can complete the workflow; no rejected/unaccepted item appears in the session; no autoplay or music-era claims; unavailable playback has a usable fallback.
+  Verify: Keyboard/phone layout and print checks; test audible playback if the browser supports it, otherwise record the limitation.
+  Progress: Browser start → Worked well → finish passed; phone width 390 px showed no horizontal overflow. Click-to-load Spotify and source-derived YouTube links are implemented. Confirmed favourites can enter only after explicit review. Actual print output and audible playback remain unverified; the IAB print invocation timed out without a verified preview. Tall desktop sessions now scroll within the sidebar.
+
+- [ ] **8. Task review and fair evaluation**
+  Spec ref: Section 10; T13.
+  What to build: Small caregiver or clearly labelled proxy task review and, time permitting, the matched three-arm comparison.
+  Acceptance: Report actual completion/effort/comprehension evidence; category-specific completeness checks; no unasked-filter violations or invented success rates.
+  Verify: Freeze prompts/pools and record results, failures, rater counts and limitations. Keep provider data private.
+
+- [ ] **9. Container, public deployment and hardening**
+  Spec ref: T12.
+  What to build: Build/run the standalone container, configure the chosen Cloud project/secrets, bounded usage controls and external judge access.
+  Acceptance: Full flow works from a private phone browser; normal ten-session use is not blocked; no key is in the client/image context; access remains available through November 7 noon Singapore time.
+  Verify: Docker build/run, deployed health and full-flow checks, real budget/quota configuration, cold/warm timing and release-commit consistency. Obtain any required external-operation authorization at the concrete deployment boundary.
+  Progress: Docker engine started; Linux image built and runs as UID 1001. No-key smoke/private-file/environment checks passed. Runtime-injected keys completed three live preset searches plus an agent run (3 Qloo, 2 agent, 1 screen; six completed checks; 12935 ms). Local preview now serves that image. Thirty offline checks, a ten-session admission-allowance test and isolated staged-guard tests pass. Cloud creation/billing/IAM/caps/deployment remain pending the reviewed release plan.
+
+- [ ] **10. Public release and Devpost handoff**
+  Spec ref: Hard requirements; T13–T14.
+  What to build: Public source with detected MIT license and clean setup, English description, start date, tested public app/repo URLs and supporting screenshots. Video is optional.
+  Acceptance: Required form answers are complete and supported by the actual app. No private artifacts or credentials are published. Submission follows the user's explicit authorization and live requirements.
+  Verify: Clean install, repository/secret review, public app test and final Devpost readiness check before submission. Record the submitted release and re-test the live URL.

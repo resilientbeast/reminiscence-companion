@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+qloo-private/
+qloo-guide.html
+qloo-guide-data-*.json
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+.DS_Store
