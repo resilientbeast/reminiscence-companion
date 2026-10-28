@@ -40,6 +40,7 @@ Deleting a Clerk account triggers a signed `user.deleted` webhook at `/api/webho
 
 Current runtime revision is `reminiscence-companion-accts-d50a1d9`. The handler uses Clerk's signature verifier, preserves signed bytes, bounds bodies to 64 KiB and logs no event bodies or identifiers. The endpoint subscribes only to `user.deleted`; its signing secret is pinned in Secret Manager. Forty-seven offline tests and the remote Linux build passed. Fifteen account-access checks passed again after the write guard changed.
 
+Staged disposable-account checks verified two saved records, forged-event rejection without data loss, valid atomic purge, successful duplicate delivery and rejection of a late save using a still-valid token. The public test then deleted a different disposable Clerk account through the Backend API and observed the actual webhook remove its two saved records and set the deletion marker. No genuine caregiver account was deleted.
 
 The final public browser rehearsal rendered signup, completed reserved email-code login, reopened the two-activity finished QA session, saved a new observation and verified both observations after a full reload/reopen. New session imported saved preferences with zero accepted activities, and the fresh-start bypass cleared imports while preserving the saved record. The QA account was signed out. New-password signup and social OAuth completion were not exercised.
 

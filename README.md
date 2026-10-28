@@ -2,7 +2,7 @@
 
 A practical activity planner for family caregivers supporting someone living with dementia. Begin with familiar music, films or TV, review related possibilities, and build a short session to share. An activity aid, not medical advice or therapy. Follow the person's lead.
 
-
+Try the [account-free live demo](https://reminiscence-companion-712638577178.us-central1.run.app/demo): confirm a favourite, explore related activities, review the evidence and build a short session.
 
 ## Current status
 
@@ -10,11 +10,13 @@ The [live app](https://reminiscence-companion-712638577178.us-central1.run.app/)
 
 The [public app](https://reminiscence-companion-712638577178.us-central1.run.app/) supports live Qloo search and exact-match confirmation, bounded Gemini tool use, grounded advisory content checks, explicit acceptance, favourite/rejection feedback, before/after ranking evidence, and an ordered two- or three-activity session with start/finish and print controls. Rating-held results cannot enter a session. Missing/failed screening stays visible for caregiver review.
 
+Gemini uses the direct Google provider with `gemini-3.8-flash`. Linux-container and staged Cloud Run checks pass, including the public browser workflow. Observed runs varied, and a timeout correctly used the labelled fallback; no latency promise is made. Independent caregiver review remains further validation. See the [deployment record](docs/hackathon-build/deployment.md) for exact evidence and limits.
 
 New sessions reuse favourites, explicit positive/negative feedback and discovery preferences from this account's saved sessions. The latest saved decision wins for conflicting feedback; new activity lists start empty. Use **Start without saved preferences** for a fresh session. Saving remains explicit, and deleting a saved session removes it from the history used for future sessions. One caregiver workspace currently represents one person.
 
 Search resolves matches after a 500 ms pause in typing, cancels superseded requests, and caches a small number of recent lookups in the open page. Exact-match confirmation is still required. Result and discovery images come only from Qloo-returned HTTPS image URLs, with a placeholder when missing or unavailable. Clerk development mode is the chosen hackathon configuration; migration to production is outside this demo's scope.
 
+Deleting a Clerk account triggers signed-webhook cleanup of its saved sessions. Duplicate deliveries are safe to repeat and failures return a retry status. A minimal hashed deletion marker prevents late saves from recreating deleted data. See [account setup and verification](docs/hackathon-build/accounts.md).
 
 ## Local setup
 

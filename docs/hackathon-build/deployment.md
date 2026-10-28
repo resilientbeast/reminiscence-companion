@@ -22,11 +22,13 @@ The user authorized Clerk signup/login, a clear landing page, and private sessio
 
 Builds ran remotely with local Docker stopped. The cleanup image passed 47 offline checks, production compilation, 15 two-account access checks, five staged signed-cleanup checks and a 12-asset configured-secret scan. A subsequent actual Clerk account deletion delivered the webhook and removed both saved sessions. The signed handler ignores other event types, rejects forged/expired signatures, retries storage failures and retains only a minimal hashed deletion marker to prevent late saves. Public HTTP checks passed after promotion.
 
+The earlier preference/image release `cd05d9a` passed six hosted memory/image checks and browser typeahead, loaded images, remembered New session and the fresh-start bypass. The current browser rehearsal verified a labelled fallback followed by successful agent runs, provider attribution, explicit review before acceptance, feedback refresh and a finished two-activity session. Supporting account checks are recorded in [accounts.md](accounts.md).
 
 The user confirmed audible Nat King Cole Spotify preview playback in the in-app browser. This is human-reported success for one official artist preview; full tracks, every artist, other browsers and regions are not verified. Print session produced a one-page PDF that was rendered and visually checked: both activities, order, time, observed response and completion are present without clipping. Physical paper output remains unverified.
 
 Saving is explicit and account-scoped; updates check revisions and deletion is available. Records do not contain recipient identity/health fields, discovery pools or traces. A simulated 390 px viewport had a 375 px document width with no horizontal overflow; keyboard controls completed the session at that width. Physical-phone testing and independent caregiver review remain future work. Clerk development mode is the chosen demo configuration. No new medical or superiority claims are made.
 
+Public source: [resilientbeast/reminiscence-companion](https://github.com/resilientbeast/reminiscence-companion), branch `main`. Application/runtime files match the deployed image. Anonymous access, GitHub MIT detection and absence of private configuration files were verified.
 
 ## Earlier account-free release (historical)
 
@@ -69,3 +71,4 @@ Judge access is intended to remain available through **7 November 2026, noon Sin
 
 ## Remaining release work
 
+Independent caregiver/proxy review, physical-phone/paper-print checks, broader playback coverage and a matched comparison remain optional further validation. This deployment does not establish clinical benefit or superiority over a plain LLM.
