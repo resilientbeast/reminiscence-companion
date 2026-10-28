@@ -1,7 +1,7 @@
 # Build checklist
 
 
-Execution: Cloud Run deployment is live under the user's explicit approval, with verified project cap/alerts, pinned secrets and public workflow checks. See `deployment.md`. Print output, audible playback, physical-phone/accessibility checks and independent caregiver review remain unverified. Source is committed locally but not published; no Devpost submission occurred. The user's choice to retain current billing despite Google's prepay migration notice is recorded as an availability risk.
+Execution: Cloud Run deployment is live under the user's explicit approval, with verified project cap/alerts, pinned secrets and public workflow checks. See `deployment.md`. The user confirmed one audible Nat King Cole Spotify preview in the in-app browser. Print output, broader playback coverage, physical-phone/accessibility checks and independent caregiver review remain unverified. Source is committed locally but not published; no Devpost submission occurred. The user's choice to retain current billing despite Google's prepay migration notice is recorded as an availability risk.
 
 The demo's key moment: confirm a favourite → inspect source evidence → reject a discovery → see the exclusion → accept and finish a small session. Documentation tracks actual completion, not planned capability.
 
@@ -83,6 +83,15 @@ The demo's key moment: confirm a favourite → inspect source evidence → rejec
 - [x] Development Clerk application claimed into the user's account; keys remain local/server-side except the intentionally public publishable key.
 - [x] 35 offline checks, production build, 15 hosted account-isolation checks, actual browser save/finish/reload/reopen, runtime key injection and asset/credential isolation.
 - [x] Cloud Run release `reminiscence-companion-accts-209485e` promoted to 100% of the existing public URL; resource/spend controls retained and local Docker stopped.
-- [ ] Account-deletion webhook/purge, fresh phone/physical-device/accessibility checks, caregiver review and existing print/audio verification remain future work. The user explicitly chose Clerk development mode for the hackathon; production migration is out of scope.
+- [ ] Account-deletion webhook/purge, fresh phone/physical-device/accessibility checks, caregiver review, print verification and broader playback coverage remain future work. The user explicitly chose Clerk development mode for the hackathon; production migration is out of scope.
 
 See `accounts.md` and `deployment.md` for evidence, exact source/image and limitations.
+
+## Preference and discovery update — 28 October 2026
+
+- [x] New sessions reuse this account's saved favourites, explicit feedback and discovery settings. Latest saved decisions win; activities start empty; saving remains explicit. A fresh-start bypass is available.
+- [x] Search after a 500 ms typing pause, category-aware bounded cache, cancellation/stale-result handling and explicit exact-match confirmation.
+- [x] Search/discovery images from Qloo-returned HTTPS URLs with missing/failed-image placeholders.
+- [x] 41 offline checks, production compilation, six hosted memory/image checks, browser search/images and both New session paths, HTTP and 12-asset secret checks. Tested immutable revision `reminiscence-companion-accts-cd05d9a` receives 100% traffic.
+- [x] User-reported audible Nat King Cole official Spotify preview in this in-app browser; no universal or full-track claim.
+- [ ] Recipient profiles and shared care teams remain proposed extensions. Profiles require scoped sessions/preferences and migration of existing records; teams additionally require invitations, membership, roles and revocation. Neither is implemented in this release.

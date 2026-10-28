@@ -36,7 +36,17 @@ The requested Clerk development application was initialized, then claimed and li
 
 Deleting a Clerk account does not automatically purge Firestore sessions yet; delete saved sessions first. No organization/team sharing, recipient profiles, clinical records, continuous backups or account-deletion webhook is implemented. New-session preference carry-over is derived from this account's saved sessions, using the latest saved decision for conflicting feedback and the latest saved discovery settings. Starting without remembered preferences is available; accepted activities never carry automatically. Global per-process discovery limits and provider spend controls still apply; accounts do not create unlimited capacity.
 
-## Verification record
+## Current preference/search verification — 28 October 2026
+
+Revision `reminiscence-companion-accts-cd05d9a`, source `cd05d9a0aff5520c30913b49eba9a1ad96662e07`, is live at 100% traffic. TypeScript, 41 offline checks and production compilation passed. Six hosted checks verified saved preferences/settings with no carried activities, memory isolation between two Clerk accounts, latest rejection precedence, removal of test history restoring the previous memory, and reachable artist/film images. Temporary records were removed and test API sessions revoked.
+
+The browser signed in with the reserved QA account and saw its saved Sinatra favourite and Nat King Cole taste signal in a fresh planner, with zero accepted activities. Both New session and Start without saved preferences worked; the latter left the saved record intact. The QA account was signed out afterward. Automatic search handled rapid query changes without showing stale Sinatra matches for Lata Mangeshkar, and all five returned Qloo images loaded. Exact-match confirmation is still required. HTTP smoke and 12 application-asset credential checks passed on the tagged preview; public HTTP smoke, traffic/image and runtime identity checks passed after promotion. Local Docker stayed stopped.
+
+Memory uses at most 20 saved records, retaining up to six confirmed favourites, 12 additional positive signals and 100 rejections. Latest saved state resolves conflicts, so unsaved clicks never alter later sessions. Deleting a record removes it from the derived history; another record can still retain the same preference. A fresh start bypasses memory for that session without deleting history. Current workspaces represent one person, and profiles/team sharing remain separate proposed work.
+
+The user confirmed hearing the official Nat King Cole Spotify preview in the in-app browser. This verifies one preview in that browser, not full songs, all artists or all regions. Actual print output, a fresh phone-size/physical-device/accessibility review and independent caregiver validation remain unverified.
+
+## Earlier account-stage verification record
 
 TypeScript and 35 offline tests passed, including ownership namespace separation, held/unaccepted/duplicate activity rejection, field-smuggling rejection, invalid eras/conflicting feedback, required revisions and conversion of real-shaped Qloo anchors before saving. A credential-free production build plus runtime-injected-key HTTP smoke passed. Local browser checks showed the explicit caregiver/dementia landing page, Clerk signup component and successful reserved-account login. Cloud upload inventory excluded credentials and private files.
 

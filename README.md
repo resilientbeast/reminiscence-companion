@@ -10,11 +10,11 @@ The [public app](https://reminiscence-companion-712638577178.us-central1.run.app
 
 Gemini uses the direct Google provider with `gemini-3.8-flash`. Linux-container and staged Cloud Run checks pass, including the public browser workflow. Observed runs varied, and a timeout correctly used the labelled fallback; no latency promise is made. Caregiver review, public repository publication and submission remain release work. See the [deployment record](docs/hackathon-build/deployment.md) for exact evidence and limits.
 
-## Local setup
-
 New sessions reuse favourites, explicit positive/negative feedback and discovery preferences from this account's saved sessions. The latest saved decision wins for conflicting feedback; new activity lists start empty. Use **Start without saved preferences** for a fresh session. Saving remains explicit, and deleting a saved session removes it from the history used for future sessions. One caregiver workspace currently represents one person.
 
 Search resolves matches after a 500 ms pause in typing, cancels superseded requests, and caches a small number of recent lookups in the open page. Exact-match confirmation is still required. Result and discovery images come only from Qloo-returned HTTPS image URLs, with a placeholder when missing or unavailable. Clerk development mode is the chosen hackathon configuration; migration to production is outside this demo's scope.
+
+## Local setup
 
 Use Node.js 24.21.0 and npm. From a clean checkout:
 
@@ -65,7 +65,7 @@ Offline provider/planner tests inject mock HTTP responses; `npm test` never need
 2. Choose categories and an optional film/TV era. Explore possibilities, then inspect Qloo input attribution, category rank and the separate selected position.
 3. Accept two or three activities. You can also expand a confirmed favourite and explicitly review it as a starting activity; this is a search match, not a ranked recommendation. Flagged or incomplete checks require explicit review acknowledgement. Unknown/unsupported ratings stay held. Acceptance makes no discovery request.
 4. Mark a known favourite, reject a discovery, or skip it for one refresh. Refresh to send those signals/exclusions. Accepted activities remain in place; the before/after summary separates Qloo ordering from model selection.
-5. Set activity/time, start the session and follow the person's pace. “Worked well” records an observed response separately from familiarity. Finish or return to planning. Optional Spotify embeds load only on click. YouTube searches include a returned notable song when available; external media availability varies. Actual print output and audible playback remain unverified.
+5. Set activity/time, start the session and follow the person's pace. “Worked well” records an observed response separately from familiarity. Finish or return to planning. Optional Spotify embeds load only on click. YouTube searches include a returned notable song when available; external media availability varies. The user confirmed hearing the Nat King Cole official Spotify preview in the in-app browser. This verifies that preview in that browser, not full tracks or universal playback. Actual print output remains unverified.
 
 `POST /api/search` accepts a bounded query and category. `POST /api/plan` validates cultural IDs and explicit policy. The agent-facing recommendation tool cannot change signals, exclusions or policy. Compact current-run keys map to actual Qloo IDs in server code; selection must stay inside the returned pool. Source facts and provenance never come from final model prose. Content flags must quote a returned field and an exact evidence excerpt.
 
