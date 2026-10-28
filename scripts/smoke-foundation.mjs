@@ -10,18 +10,17 @@ assert.ok(html.includes("Not medical advice or therapy"));
 const demo = await fetch(new URL("/demo", base));
 assert.equal(demo.status, 200);
 assert.ok((await demo.text()).includes("Confirm a favourite"));
-for (const pathname of ["/api/sessions", "/api/sessions/11111111-1111-4111-8111-111111111111"]) {
-  const response = await fetch(new URL(pathname, base));
-  assert.equal(response.status, 401, "Private session data must require login.");
-  assert.equal((await response.json()).code, "sign_in_required");
-}
-
 const health = await fetch(new URL("/api/health", base));
 assert.equal(health.status, 200);
 const healthBody = await health.json();
 assert.equal(healthBody.status, "ok");
 assert.equal(healthBody.milestone, "live-planner");
 assert.equal(typeof healthBody.liveAgentAvailable, "boolean");
+for (const pathname of ["/api/sessions", "/api/sessions/11111111-1111-4111-8111-111111111111"]) {
+  const response = await fetch(new URL(pathname, base));
+  assert.equal(response.status, healthBody.accountsConfigured ? 401 : 503, "Private session data must fail closed, including when account configuration is absent.");
+  assert.equal((await response.json()).code, healthBody.accountsConfigured ? "sign_in_required" : "auth_unavailable");
+}
 
 const stylesheet = html.match(/href="([^"\s]+\.css(?:\?[^"\s]*)?)"/);
 assert.ok(stylesheet, "Production page must reference its stylesheet.");

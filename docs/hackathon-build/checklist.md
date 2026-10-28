@@ -1,7 +1,7 @@
 # Build checklist
 
 
-Execution: Cloud Run deployment is live under the user's explicit approval, with verified project cap/alerts, pinned secrets and public workflow checks. See `deployment.md`. The user confirmed one audible Nat King Cole Spotify preview in the in-app browser. Print output, broader playback coverage, physical-phone/accessibility checks and independent caregiver review remain unverified. Source is committed locally but not published; no Devpost submission occurred. The user's choice to retain current billing despite Google's prepay migration notice is recorded as an availability risk.
+Execution: Cloud Run deployment is live under the user's explicit approval, with verified project cap/alerts, pinned secrets and public workflow checks. See `deployment.md`. The user confirmed one audible Nat King Cole Spotify preview in the in-app browser. The final rehearsal verified a one-page print-to-PDF artifact and a simulated 390 px layout. Broader playback, physical-phone/paper-print/accessibility checks and independent caregiver review remain unverified. The owner will perform the final Devpost submission. The user's choice to retain current billing despite Google's prepay migration notice is recorded as an availability risk.
 
 The demo's key moment: confirm a favourite → inspect source evidence → reject a discovery → see the exclusion → accept and finish a small session. Documentation tracks actual completion, not planned capability.
 
@@ -95,3 +95,10 @@ See `accounts.md` and `deployment.md` for evidence, exact source/image and limit
 - [x] 41 offline checks, production compilation, six hosted memory/image checks, browser search/images and both New session paths, HTTP and 12-asset secret checks. Tested immutable revision `reminiscence-companion-accts-cd05d9a` receives 100% traffic.
 - [x] User-reported audible Nat King Cole official Spotify preview in this in-app browser; no universal or full-track claim.
 - [ ] Recipient profiles and shared care teams remain proposed extensions. Profiles require scoped sessions/preferences and migration of existing records; teams additionally require invitations, membership, roles and revocation. Neither is implemented in this release.
+
+## Final preparation — 28 October 2026
+
+- [x] Signed Clerk account-deletion cleanup, duplicate/retry handling and protection against late writes. Actual Clerk deletion delivery removed disposable saved-session data.
+- [x] 47 offline checks, clean credential-free checkout/install/build/HTTP smoke, 15 hosted account-access checks, five staged cleanup checks and actual public webhook delivery.
+- [x] Browser review/feedback/order/time/start/observed response/finish; simulated 390 px viewport without horizontal overflow; actual print-to-PDF output rendered and visually verified.
+- [ ] Public repository publication and final repository checks are recorded in the handoff once verified. Devpost submission belongs to the owner.

@@ -10,21 +10,22 @@ The user authorized Clerk signup/login, a clear landing page, and private sessio
 
 | Setting | Verified value |
 | --- | --- |
-| Ready / 100% traffic revision | `reminiscence-companion-accts-cd05d9a` |
-| Runtime source commit | `cd05d9a0aff5520c30913b49eba9a1ad96662e07` |
-| Immutable image digest | `sha256:735c5cd0e11cde138dee1ad873c2ec53bedd55342e806f6191ca9399fd272aa6` |
+| Ready / 100% traffic revision | `reminiscence-companion-accts-d50a1d9` |
+| Runtime source commit | `d50a1d9f3c0457cb83e448874b1d7d5c358f173e` |
+| Immutable image digest | `sha256:2f4a800f245d87fa1b541c2e1f30f82cd6e1743da5fa05dc140492183dd5c8b9` |
 | Artifact repository | `us-central1-docker.pkg.dev/reminiscence-qloo-20261027/reminiscence/app` |
-| Cloud Build | `3c23e095-f983-4389-bd3e-3e904fa9e2a2` |
+| Cloud Build | `fb0eefb7-95d3-42be-8b1b-9eb59bb50b23` |
 | Runtime identity | Existing dedicated `reminiscence-runtime` account |
-| Secret references | `qloo-api-key:1`, `gemini-api-key:1`, `clerk-secret-key:1` |
+| Secret references | `qloo-api-key:1`, `gemini-api-key:1`, `clerk-secret-key:1`, `clerk-webhook-signing-secret:1` |
 | Saved sessions | Private Firestore Standard Native `(default)` database, `us-central1` |
 | Resources / spend settings | Existing 1 CPU / 512 MiB, concurrency 2, min 0 / max 1; original project alerts and Gemini cap retained |
 
-Builds ran remotely with local Docker stopped. The current image passed 41 offline checks and production compilation. Six hosted integration checks verified saved preference/settings carry-over with empty activity lists, two-account memory isolation, a newer rejection replacing a positive preference, removal of disposable test history restoring the prior memory, and resolving Qloo artist/film images. The browser verified automatic search after rapid query changes, five loaded Qloo images, Clerk login, remembered New session and the fresh-start bypass. HTTP checks and a 12-asset configured-secret scan passed before promotion. The public HTTP smoke passed after promotion; Cloud Run read-back confirmed 100% traffic, the image digest and existing runtime identity. Earlier full saved-session CRUD/access checks are recorded in [accounts.md](accounts.md).
+Builds ran remotely with local Docker stopped. The cleanup image passed 47 offline checks, production compilation, 15 two-account access checks, five staged signed-cleanup checks and a 12-asset configured-secret scan. A subsequent actual Clerk account deletion delivered the webhook and removed both saved sessions. The signed handler ignores other event types, rejects forged/expired signatures, retries storage failures and retains only a minimal hashed deletion marker to prevent late saves. Public HTTP checks passed after promotion.
 
-The user confirmed audible Nat King Cole Spotify preview playback in the in-app browser. This is human-reported success for one official artist preview; full tracks, every artist, other browsers and regions are not verified. Print output remains unverified.
 
-Saving is explicit and account-scoped; updates check revisions and deletion is available. Records do not contain recipient identity/health fields, discovery pools or traces. Automatic purge after Clerk account deletion, a new phone-width/physical-device check and independent caregiver review remain future work. Clerk development mode is the chosen demo configuration. No new medical or superiority claims are made.
+The user confirmed audible Nat King Cole Spotify preview playback in the in-app browser. This is human-reported success for one official artist preview; full tracks, every artist, other browsers and regions are not verified. Print session produced a one-page PDF that was rendered and visually checked: both activities, order, time, observed response and completion are present without clipping. Physical paper output remains unverified.
+
+Saving is explicit and account-scoped; updates check revisions and deletion is available. Records do not contain recipient identity/health fields, discovery pools or traces. A simulated 390 px viewport had a 375 px document width with no horizontal overflow; keyboard controls completed the session at that width. Physical-phone testing and independent caregiver review remain future work. Clerk development mode is the chosen demo configuration. No new medical or superiority claims are made.
 
 ## Earlier account-free release (historical)
 
@@ -43,7 +44,7 @@ Saving is explicit and account-scoped; updates check revisions and deletion is a
 
 This earlier image was built from the recorded source commit with the matching OCI revision label. It has been superseded by the account-stage release above. No source repository or Devpost submission has been published by these deployments.
 
-## Staged verification
+## Earlier staged verification (historical)
 
 The service was initially private. Anonymous requests received HTTP 403; authenticated page/CSS/health checks passed, and local config/private research paths returned 404. All five preset names resolved through the hosted API. Two mixed-category runs completed in agent mode with six candidates and six completed metadata checks each (11848 ms and 13496 ms). Actual exclusion parameters and stable accepted ordering were checked.
 
@@ -67,4 +68,3 @@ Judge access is intended to remain available through **7 November 2026, noon Sin
 
 ## Remaining release work
 
-Independent caregiver/proxy review, physical-phone checks, actual print verification, broader playback coverage, a matched three-arm comparison if time permits, public MIT repository publication and Devpost preparation/submission remain separate work. This deployment does not establish clinical benefit or superiority over a plain LLM.

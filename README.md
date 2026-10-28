@@ -2,6 +2,8 @@
 
 A practical activity planner for family caregivers supporting someone living with dementia. Begin with familiar music, films or TV, review related possibilities, and build a short session to share. An activity aid, not medical advice or therapy. Follow the person's lead.
 
+
+
 ## Current status
 
 The [live app](https://reminiscence-companion-712638577178.us-central1.run.app/) now includes a landing page explaining the dementia-caregiver audience and workflow, Clerk signup/login, and private Firestore saved sessions. `/workspace` is authenticated; `/demo` retains the complete temporary planning flow without signup. Saving is explicit, each account can hold 20 sessions, and revision checks prevent silent overwrites from an older tab. The claimed Clerk application is in development mode. See [account setup and verification](docs/hackathon-build/accounts.md) and the [exact released artifact](docs/hackathon-build/deployment.md).
@@ -13,6 +15,7 @@ Gemini uses the direct Google provider with `gemini-3.8-flash`. Linux-container 
 New sessions reuse favourites, explicit positive/negative feedback and discovery preferences from this account's saved sessions. The latest saved decision wins for conflicting feedback; new activity lists start empty. Use **Start without saved preferences** for a fresh session. Saving remains explicit, and deleting a saved session removes it from the history used for future sessions. One caregiver workspace currently represents one person.
 
 Search resolves matches after a 500 ms pause in typing, cancels superseded requests, and caches a small number of recent lookups in the open page. Exact-match confirmation is still required. Result and discovery images come only from Qloo-returned HTTPS image URLs, with a placeholder when missing or unavailable. Clerk development mode is the chosen hackathon configuration; migration to production is outside this demo's scope.
+
 
 ## Local setup
 
@@ -38,6 +41,8 @@ npm run start
 With the production server running, `npm run smoke` checks the page, health response, stylesheet and private-path isolation. It is an HTTP check; visual and interaction verification are separate.
 
 Copy `.env.example` to `.env.local` and fill values locally. Obtain a personal Qloo key through the [official developer guide](https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide). Hackathon keys use the hackathon endpoint. Provider keys and `CLERK_SECRET_KEY` belong only on the server. Clerk's `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is intentionally public; it does not grant backend access. Existing private `.env.txt` research credentials are not automatically loaded by this scaffold.
+
+The hosted guest demo needs no setup. For a local guest demo, configure Qloo and Gemini; Clerk/Firestore are optional unless you want private saved sessions. For accounts, configure Clerk keys and a Firestore project with authorized Application Default Credentials. Register `/api/webhooks/clerk` for only `user.deleted` in that Clerk application's webhook settings, then set `CLERK_WEBHOOK_SIGNING_SECRET` server-side. Never send the signing secret to the browser. Webhook delivery requires an externally reachable URL.
 
 ## Gemini setup and integration spike
 
@@ -65,7 +70,7 @@ Offline provider/planner tests inject mock HTTP responses; `npm test` never need
 2. Choose categories and an optional film/TV era. Explore possibilities, then inspect Qloo input attribution, category rank and the separate selected position.
 3. Accept two or three activities. You can also expand a confirmed favourite and explicitly review it as a starting activity; this is a search match, not a ranked recommendation. Flagged or incomplete checks require explicit review acknowledgement. Unknown/unsupported ratings stay held. Acceptance makes no discovery request.
 4. Mark a known favourite, reject a discovery, or skip it for one refresh. Refresh to send those signals/exclusions. Accepted activities remain in place; the before/after summary separates Qloo ordering from model selection.
-5. Set activity/time, start the session and follow the person's pace. “Worked well” records an observed response separately from familiarity. Finish or return to planning. Optional Spotify embeds load only on click. YouTube searches include a returned notable song when available; external media availability varies. The user confirmed hearing the Nat King Cole official Spotify preview in the in-app browser. This verifies that preview in that browser, not full tracks or universal playback. Actual print output remains unverified.
+5. Set activity/time, start the session and follow the person's pace. “Worked well” records an observed response separately from familiarity. Finish or return to planning. Optional Spotify embeds load only on click. YouTube searches include a returned notable song when available; external media availability varies. The user confirmed hearing the Nat King Cole official Spotify preview in the in-app browser. This verifies that preview in that browser, not full tracks or universal playback. The browser print action produced a visually verified one-page PDF. Physical paper output remains unverified.
 
 `POST /api/search` accepts a bounded query and category. `POST /api/plan` validates cultural IDs and explicit policy. The agent-facing recommendation tool cannot change signals, exclusions or policy. Compact current-run keys map to actual Qloo IDs in server code; selection must stay inside the returned pool. Source facts and provenance never come from final model prose. Content flags must quote a returned field and an exact evidence excerpt.
 

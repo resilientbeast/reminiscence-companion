@@ -34,9 +34,16 @@ The root layout reads runtime-injected account configuration. Missing Clerk conf
 
 The requested Clerk development application was initialized, then claimed and linked as `reminiscence-companion` after the user completed Clerk authorization. The claimed application's local secret still matches the Secret Manager version. Development keys/test mode and Clerk's visible development banner are intentional for the hackathon. The user explicitly decided to keep development mode; production migration is not a demo milestone. Development email quotas apply, so integration checks use Clerk's reserved test addresses, which do not send mail. See [Clerk testing documentation](https://clerk.com/docs/guides/development/testing/test-emails-and-phones).
 
-Deleting a Clerk account does not automatically purge Firestore sessions yet; delete saved sessions first. No organization/team sharing, recipient profiles, clinical records, continuous backups or account-deletion webhook is implemented. New-session preference carry-over is derived from this account's saved sessions, using the latest saved decision for conflicting feedback and the latest saved discovery settings. Starting without remembered preferences is available; accepted activities never carry automatically. Global per-process discovery limits and provider spend controls still apply; accounts do not create unlimited capacity.
+Deleting a Clerk account triggers a signed `user.deleted` webhook at `/api/webhooks/clerk`. A Firestore transaction removes saved sessions and retains only a hashed namespace marker with `deleted: true` and count zero. This prevents in-flight or late saves from recreating session data. Duplicate deliveries are safe, and storage failures return 503 for delivery retries. Cleanup is asynchronous. No organization/team sharing, recipient profiles, clinical records or continuous backups are implemented. New-session preference carry-over is derived from this account's saved sessions, using the latest saved decision for conflicting feedback and the latest saved discovery settings. Starting without remembered preferences is available; accepted activities never carry automatically. Global per-process discovery limits and provider spend controls still apply; accounts do not create unlimited capacity.
 
-## Current preference/search verification — 28 October 2026
+## Cleanup release verification — 28 October 2026
+
+Current runtime revision is `reminiscence-companion-accts-d50a1d9`. The handler uses Clerk's signature verifier, preserves signed bytes, bounds bodies to 64 KiB and logs no event bodies or identifiers. The endpoint subscribes only to `user.deleted`; its signing secret is pinned in Secret Manager. Forty-seven offline tests and the remote Linux build passed. Fifteen account-access checks passed again after the write guard changed.
+
+
+The final public browser rehearsal rendered signup, completed reserved email-code login, reopened the two-activity finished QA session, saved a new observation and verified both observations after a full reload/reopen. New session imported saved preferences with zero accepted activities, and the fresh-start bypass cleared imports while preserving the saved record. The QA account was signed out. New-password signup and social OAuth completion were not exercised.
+
+## Earlier preference/search verification — 28 October 2026
 
 Revision `reminiscence-companion-accts-cd05d9a`, source `cd05d9a0aff5520c30913b49eba9a1ad96662e07`, is live at 100% traffic. TypeScript, 41 offline checks and production compilation passed. Six hosted checks verified saved preferences/settings with no carried activities, memory isolation between two Clerk accounts, latest rejection precedence, removal of test history restoring the previous memory, and reachable artist/film images. Temporary records were removed and test API sessions revoked.
 
@@ -44,7 +51,7 @@ The browser signed in with the reserved QA account and saw its saved Sinatra fav
 
 Memory uses at most 20 saved records, retaining up to six confirmed favourites, 12 additional positive signals and 100 rejections. Latest saved state resolves conflicts, so unsaved clicks never alter later sessions. Deleting a record removes it from the derived history; another record can still retain the same preference. A fresh start bypasses memory for that session without deleting history. Current workspaces represent one person, and profiles/team sharing remain separate proposed work.
 
-The user confirmed hearing the official Nat King Cole Spotify preview in the in-app browser. This verifies one preview in that browser, not full songs, all artists or all regions. Actual print output, a fresh phone-size/physical-device/accessibility review and independent caregiver validation remain unverified.
+The user confirmed hearing the official Nat King Cole Spotify preview in the in-app browser. This verifies one preview in that browser, not full songs, all artists or all regions. At this earlier checkpoint, print and a fresh phone-size check were unverified; the final rehearsal subsequently verified print-to-PDF and a simulated 390 px layout. Physical-device/accessibility review and independent caregiver validation remain unverified.
 
 ## Earlier account-stage verification record
 
