@@ -83,7 +83,7 @@ The demo's key moment: confirm a favourite → inspect source evidence → rejec
 - [x] Development Clerk application claimed into the user's account; keys remain local/server-side except the intentionally public publishable key.
 - [x] 35 offline checks, production build, 15 hosted account-isolation checks, actual browser save/finish/reload/reopen, runtime key injection and asset/credential isolation.
 - [x] Cloud Run release `reminiscence-companion-accts-209485e` promoted to 100% of the existing public URL; resource/spend controls retained and local Docker stopped.
-- [ ] Account-deletion webhook/purge, fresh phone/physical-device/accessibility checks, caregiver review, print verification and broader playback coverage remain future work. The user explicitly chose Clerk development mode for the hackathon; production migration is out of scope.
+- [ ] Physical-device/accessibility checks, caregiver review, physical paper printing and broader playback coverage remain optional further validation. Signed cleanup, simulated phone width and print-to-PDF were completed in final preparation below. The user explicitly chose Clerk development mode for the hackathon; production migration is out of scope.
 
 See `accounts.md` and `deployment.md` for evidence, exact source/image and limitations.
 
@@ -101,4 +101,4 @@ See `accounts.md` and `deployment.md` for evidence, exact source/image and limit
 - [x] Signed Clerk account-deletion cleanup, duplicate/retry handling and protection against late writes. Actual Clerk deletion delivery removed disposable saved-session data.
 - [x] 47 offline checks, clean credential-free checkout/install/build/HTTP smoke, 15 hosted account-access checks, five staged cleanup checks and actual public webhook delivery.
 - [x] Browser review/feedback/order/time/start/observed response/finish; simulated 390 px viewport without horizontal overflow; actual print-to-PDF output rendered and visually verified.
-- [ ] Public repository publication and final repository checks are recorded in the handoff once verified. Devpost submission belongs to the owner.
+- [x] Public repository published at https://github.com/resilientbeast/reminiscence-companion with anonymous access, MIT detection, matching runtime source and no private configuration/research files. Devpost submission belongs to the owner.

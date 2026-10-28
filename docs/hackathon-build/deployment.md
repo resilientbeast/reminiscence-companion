@@ -27,6 +27,7 @@ The user confirmed audible Nat King Cole Spotify preview playback in the in-app 
 
 Saving is explicit and account-scoped; updates check revisions and deletion is available. Records do not contain recipient identity/health fields, discovery pools or traces. A simulated 390 px viewport had a 375 px document width with no horizontal overflow; keyboard controls completed the session at that width. Physical-phone testing and independent caregiver review remain future work. Clerk development mode is the chosen demo configuration. No new medical or superiority claims are made.
 
+
 ## Earlier account-free release (historical)
 
 | Setting | Verified value |

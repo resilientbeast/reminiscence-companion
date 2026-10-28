@@ -10,7 +10,6 @@ The [live app](https://reminiscence-companion-712638577178.us-central1.run.app/)
 
 The [public app](https://reminiscence-companion-712638577178.us-central1.run.app/) supports live Qloo search and exact-match confirmation, bounded Gemini tool use, grounded advisory content checks, explicit acceptance, favourite/rejection feedback, before/after ranking evidence, and an ordered two- or three-activity session with start/finish and print controls. Rating-held results cannot enter a session. Missing/failed screening stays visible for caregiver review.
 
-Gemini uses the direct Google provider with `gemini-3.8-flash`. Linux-container and staged Cloud Run checks pass, including the public browser workflow. Observed runs varied, and a timeout correctly used the labelled fallback; no latency promise is made. Caregiver review, public repository publication and submission remain release work. See the [deployment record](docs/hackathon-build/deployment.md) for exact evidence and limits.
 
 New sessions reuse favourites, explicit positive/negative feedback and discovery preferences from this account's saved sessions. The latest saved decision wins for conflicting feedback; new activity lists start empty. Use **Start without saved preferences** for a fresh session. Saving remains explicit, and deleting a saved session removes it from the history used for future sessions. One caregiver workspace currently represents one person.
 
