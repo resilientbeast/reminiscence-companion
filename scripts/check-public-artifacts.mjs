@@ -35,7 +35,7 @@ await walk(root);
 await walk(path.join(root, ".next", "static"), true);
 const violations = [];
 function containsCredential(content) {
-  return secrets.some((value) => content.includes(value)) || /\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b/.test(content) || /\bsk_(?:test|live)_[A-Za-z0-9]{20,}\b/.test(content) || /\bAIza[A-Za-z0-9_-]{35}\b/.test(content);
+  return secrets.some((value) => content.includes(value)) || /\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b/.test(content) || /\bsk_(?:test|live)_[A-Za-z0-9]{20,}\b/.test(content) || /\bwhsec_[A-Za-z0-9+/=_-]{20,}\b/.test(content) || /\bAIza[A-Za-z0-9_-]{35}\b/.test(content);
 }
 for (const file of files) {
   const content = await fs.readFile(file, "utf8");

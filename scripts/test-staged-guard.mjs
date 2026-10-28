@@ -22,7 +22,7 @@ try {
   const stagedOnly = spawnSync(process.execPath, ["scripts/check-public-artifacts.mjs", "--staged"], { env: environment, encoding: "utf8" });
   assert.equal(stagedOnly.status, 1, "A synthetic credential in a staged-only blob must be rejected even without a working file.");
   assert.ok(stagedOnly.stderr.includes("staged: guard-synthetic.txt"));
-  for (const [prefix, expected] of [["sk_test_", 1], ["pk_test_", 0]]) {
+  for (const [prefix, expected] of [["sk_test_", 1], ["whsec_", 1], ["pk_test_", 0]]) {
     const value = prefix + "x".repeat(32);
     const blob = execFileSync("git", ["hash-object", "-w", "--stdin"], { input: value, encoding: "utf8" }).trim();
     execFileSync("git", ["update-index", "--add", "--cacheinfo", `100644,${blob},guard-synthetic.txt`], { env: environment });
